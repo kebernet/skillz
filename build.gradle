@@ -1,0 +1,52 @@
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+        jcenter();
+    }
+    dependencies {
+        classpath 'gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.13.1'
+        classpath 'com.netflix.nebula:nebula-publishing-plugin:4.9.1'
+    }
+}
+
+apply plugin: 'nebula.maven-publish'
+
+allprojects {
+    group 'net.kebernet.skillz'
+    version '0.0.1'
+}
+
+subprojects {
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+    apply plugin: 'java'
+    sourceCompatibility = 1.8
+    task sourcesJar(type: Jar, dependsOn: classes) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        classifier = 'javadoc'
+        from javadoc.destinationDir
+    }
+
+    artifacts {
+        archives sourcesJar
+        archives javadocJar
+    }
+
+}
+
+
+repositories {
+    mavenCentral()
+    maven {
+        url  "http://dl.bintray.com/kebernet/maven"
+    }
+}
+

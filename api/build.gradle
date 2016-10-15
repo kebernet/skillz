@@ -1,0 +1,63 @@
+apply plugin: 'java'
+apply plugin: "com.github.hierynomus.license"
+apply plugin: 'nebula.maven-publish'
+
+sourceCompatibility = 1.8
+
+description = "A simplified API for creating Amazon Alexa Skills in Java"
+
+repositories {
+    mavenCentral()
+    jcenter()
+    mavenLocal()
+}
+
+dependencies {
+    compile 'net.kebernet.invoker:runtime:+'
+    compile 'org.reflections:reflections:0.9.+'
+    compile 'ognl:ognl:3.0.4'
+    compile 'com.amazon.alexa:alexa-skills-kit:+'
+    compile 'javax.servlet:servlet-api:2.5'
+    compileOnly 'javax.inject:javax.inject:1'
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+}
+
+publishing {
+    repositories {
+        maven {
+            credentials {
+                username project.hasProperty("kebernet_bintray") == null ? "" : project.getProperties().get("kebernet_bintray")
+                password project.hasProperty("kebernet_bintray_api") == null ? "" :  project.getProperties().get("kebernet_bintray_api")
+            }
+            url "https://api.bintray.com/maven/kebernet/maven/invoker/"
+        }
+    }
+    publications {
+        nebula(MavenPublication) {
+            artifact sourcesJar {
+                classifier "sources"
+            }
+            artifact javadocJar {
+                classifier "javadoc"
+            }
+            pom.withXml {
+                asNode().appendNode('url', 'https://github.com/kebernet/invoker')
+                asNode().appendNode('inceptionYear', '2016')
+                def lic = asNode().appendNode('licenses')
+                        .appendNode('license')
+                lic.appendNode('name', 'Apache Software License, Version 2.0')
+                lic.appendNode('url', 'http://www.apache.org/licenses/LICENSE-2.0.txt')
+                lic.appendNode('distribution', 'repo')
+                def scm = asNode().appendNode('scm')
+                scm.appendNode('connection', 'scm:git:git@github.com:kebernet/invoker.git')
+                scm.appendNode('url', 'https://github.com/kebernet/invoker')
+            }
+        }
+    }
+}
+
+license {
+    header rootProject.file('etc/header.txt')
+    strictCheck true
+    mapping("java", "SLASHSTAR_STYLE")
+}
