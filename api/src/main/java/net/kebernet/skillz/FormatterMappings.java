@@ -24,11 +24,11 @@ import java.util.function.Function;
 /**
  * Created by rcooper on 10/15/16.
  */
-public class ResponseMapper {
+public class FormatterMappings {
 
     private ConcurrentHashMap<Class<?>, Function<? extends Object, SpeechletResponse>> mappers = new ConcurrentHashMap<>();
 
-    public ResponseMapper(){
+    public FormatterMappings(){
     }
 
     public <T> void addMappingFunction(Class<T> type, Function<T, SpeechletResponse> mappingFunction){

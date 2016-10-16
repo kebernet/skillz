@@ -27,6 +27,8 @@ import net.kebernet.skillz.annotation.Skill;
 import net.kebernet.skillz.annotation.Slot;
 import org.reflections.Reflections;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
@@ -36,16 +38,19 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * Created by rcooper on 10/15/16.
  */
+@Singleton
 public class Registry {
 
     private static final Logger LOGGER = Logger.getLogger(Registry.class.getCanonicalName());
     private final Invoker invoker;
     private final Map<String, Class<?>> pathsToClasses;
 
+    @Inject
     public Registry(){
         LOGGER.fine("Beginning scan for skills.");
         Reflections reflections = new Reflections(Thread.currentThread().getContextClassLoader());
@@ -74,6 +79,12 @@ public class Registry {
     public Optional<IntrospectionData> getDataForPath(String path){
         return Optional.ofNullable(pathsToClasses.get(path))
                 .map(invoker::lookupType);
+    }
+
+    public Set<IntrospectionData> getAllIntrospectionData(){
+        return this.pathsToClasses.values().stream()
+                .map(invoker::lookupType)
+                .collect(Collectors.toSet());
     }
 
     public Invoker getInvoker(){

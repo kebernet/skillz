@@ -15,32 +15,38 @@
  */
 package net.kebernet.skillz.impl;
 
+import net.kebernet.invoker.runtime.impl.IntrospectionData;
+import net.kebernet.skillz.test.BurnsAndAllen;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-/**
- * Created by rcooper on 10/15/16.
- */
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class RegistryTest {
-    @Test
-    public void getDataForPath() throws Exception {
+    Registry registry = new Registry();
 
+    @Test
+    public void simpleDiscoveryTest() throws Exception {
+        Set<Class> classes = registry.getAllIntrospectionData()
+                .stream().map(IntrospectionData::getType)
+                .collect(Collectors.toSet());
+        assertTrue(classes.contains(BurnsAndAllen.class));
     }
 
     @Test
-    public void createParameterName() throws Exception {
-
+    public void findByPathSuccess() throws Exception {
+        assertEquals(BurnsAndAllen.class, registry.getDataForPath("/burnsallen")
+                .orElseThrow(RuntimeException::new));
     }
 
-    @Test
-    public void createMethodName() throws Exception {
-
+    @Test(expected = RuntimeException.class)
+    public void findByPathFail() throws Exception {
+        registry.getDataForPath("/not_a_path").orElseThrow(RuntimeException::new);
     }
 
-    @Test
-    public void checkMaxOneOf() throws Exception {
 
-    }
 
 }

@@ -15,21 +15,12 @@
  */
 package net.kebernet.skillz;
 
+import javax.inject.Singleton;
+
 /**
- * Thrown when there is a problem within the Skillz API.
+ * Created by rcooper on 10/15/16.
  */
-public class SkillzException extends RuntimeException {
-
-    public SkillzException() {
-        super();
-    }
-
-    public SkillzException(String message) {
-        super(message);
-    }
-
-    public SkillzException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
+@Singleton
+public interface TypeFactory {
+    <T> T create(Class<T> type);
 }

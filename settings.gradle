@@ -1,3 +1,4 @@
 rootProject.name = 'skillz'
 include 'api'
+include 'dropwizard'
 

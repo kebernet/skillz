@@ -15,9 +15,13 @@
  */
 package net.kebernet.skillz;
 
+import com.amazon.speech.speechlet.SpeechletResponse;
+
+import java.util.function.Function;
+
 /**
- * Created by rcooper on 10/15/16.
+ * Created by rcooper on 10/16/16.
  */
-public interface SkillFactory {
-    <T> T create(Class<T> type);
+public interface Formatter<T> extends Function<T, SpeechletResponse> {
+
 }

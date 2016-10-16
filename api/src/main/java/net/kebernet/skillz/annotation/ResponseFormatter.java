@@ -13,23 +13,22 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package net.kebernet.skillz;
+package net.kebernet.skillz.annotation;
+
+import net.kebernet.skillz.Formatter;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Thrown when there is a problem within the Skillz API.
+ * Created by rcooper on 10/16/16.
  */
-public class SkillzException extends RuntimeException {
-
-    public SkillzException() {
-        super();
-    }
-
-    public SkillzException(String message) {
-        super(message);
-    }
-
-    public SkillzException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
+@Retention(RetentionPolicy.RUNTIME)
+@Inherited
+@Target(ElementType.METHOD)
+public @interface ResponseFormatter {
+    Class<? extends Formatter> value();
 }

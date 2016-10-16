@@ -13,23 +13,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package net.kebernet.skillz;
+package net.kebernet.skillz.util;
 
 /**
- * Thrown when there is a problem within the Skillz API.
+ * Created by rcooper on 10/15/16.
  */
-public class SkillzException extends RuntimeException {
-
-    public SkillzException() {
-        super();
-    }
-
-    public SkillzException(String message) {
-        super(message);
-    }
-
-    public SkillzException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
+public class OutputUtterances {
 }

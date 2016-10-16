@@ -37,11 +37,11 @@ import java.util.logging.Logger;
  */
 public class SkillzFilter implements Filter {
     private static final Logger LOGGER = Logger.getLogger(SkillzFilter.class.getCanonicalName());
-    private final SkillFactory factory;
+    private final TypeFactory factory;
     private final Registry registry;
 
     @Inject
-    public SkillzFilter(SkillFactory factory, ResponseMapper responseBuilder){
+    public SkillzFilter(TypeFactory factory, FormatterMappings responseBuilder){
         this.factory = factory;
         this.registry = new Registry();
     }
