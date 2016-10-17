@@ -57,7 +57,6 @@ public class FormatterMappings {
     /**
      * Looks up the formatter for the given type and returns an instance of it.
      * @param type Class reference of the type to format.
-     * @param <T> The type to format.
      * @return A formatter to convert the type to a SpeechletResponse.
      */
     @SuppressWarnings("unchecked")

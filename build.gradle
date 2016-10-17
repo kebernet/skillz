@@ -46,11 +46,11 @@ subprojects {
     }
 
     task installGitHooks(type: Copy) {
-        from new File(rootProject.rootDir, '/etc/pre-commit.sh')
-        into { new File(rootProject.rootDir, '.git/hooks') }
+        from new File(rootProject.rootDir, '/etc/pre-commit')
+        into { new File(rootProject.rootDir, '.git/hooks/') }
     }
 
-    build.dependsOn installGitHooks
+    init.dependsOn installGitHooks
 
 }
 

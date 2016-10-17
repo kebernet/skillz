@@ -21,12 +21,13 @@ import com.amazon.speech.ui.PlainTextOutputSpeech;
  * A builder for PlainTextOutputSpeech.
  * <p>
  *     Example:
+ * </p>
  * <pre>
  *     PlainTextSpeedOutput output = PlainTextSpeechOutputBuilder.withText("Hello, world.")
  *                                                               .withId("id:hello")
  *                                                               .build();
 *  </pre>
- * </p>
+ *
  */
 public class PlainTextOutputBuilder {
 

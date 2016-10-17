@@ -38,8 +38,10 @@ public class RegistryTest {
 
     @Test
     public void findByPathSuccess() throws Exception {
-        assertEquals(BurnsAndAllen.class, registry.getDataForPath("/burnsallen")
-                .orElseThrow(RuntimeException::new));
+        assertEquals(BurnsAndAllen.class,
+                registry.getDataForPath("/burnsallen")
+                    .orElseThrow(RuntimeException::new)
+                    .getType());
     }
 
     @Test(expected = RuntimeException.class)

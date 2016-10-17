@@ -39,7 +39,7 @@ public @interface Slot {
 
     /** The type of the slot. This value is not used at runtime, but will be used to
      * generate the intents.json structure.
-     * @return
+     * @return The type of the slot.
      */
     String type() default "";
 }
