@@ -25,18 +25,9 @@ allprojects {
 
     group 'net.kebernet.skillz'
     version '0.0.1'
-
-    task installGitHooks(type: Copy) {
-        from new File(rootProject.rootDir, '/etc/pre-commit.sh')
-        into { new File(rootProject.rootDir, '.git/hooks') }
-    }
-
-    build.dependsOn installGitHooks
 }
 
 subprojects {
-
-
     apply plugin: 'java'
     sourceCompatibility = 1.8
     task sourcesJar(type: Jar, dependsOn: classes) {
@@ -53,6 +44,13 @@ subprojects {
         archives sourcesJar
         archives javadocJar
     }
+
+    task installGitHooks(type: Copy) {
+        from new File(rootProject.rootDir, '/etc/pre-commit.sh')
+        into { new File(rootProject.rootDir, '.git/hooks') }
+    }
+
+    build.dependsOn installGitHooks
 
 }
 
