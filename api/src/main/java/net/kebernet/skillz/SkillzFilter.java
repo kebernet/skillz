@@ -33,7 +33,9 @@ import java.util.Optional;
 import java.util.logging.Logger;
 
 /**
- * Created by rcooper on 10/15/16.
+ *  This is the servlet Filter that handles dispatching requests to the declared
+ *  Skill classes.
+ *
  */
 public class SkillzFilter implements Filter {
     private static final Logger LOGGER = Logger.getLogger(SkillzFilter.class.getCanonicalName());

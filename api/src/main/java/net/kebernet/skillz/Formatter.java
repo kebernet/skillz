@@ -20,7 +20,11 @@ import com.amazon.speech.speechlet.SpeechletResponse;
 import java.util.function.Function;
 
 /**
- * Created by rcooper on 10/16/16.
+ * A subtype of Function for converting a return value from a method into the appropriate
+ * SpeechletResponse.
+ * @see net.kebernet.skillz.annotation.ResponseFormatter
+ * @see net.kebernet.skillz.FormatterMappings
+ *
  */
 public interface Formatter<T> extends Function<T, SpeechletResponse> {
 

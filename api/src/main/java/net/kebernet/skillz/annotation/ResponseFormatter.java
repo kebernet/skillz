@@ -24,7 +24,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Created by rcooper on 10/16/16.
+ *  This annotation allows you to declare a Formatter per-method to format your return types to
+ *  SpeechletResponses. Formatter instances will be requested per-request from the
+ *  {@link net.kebernet.skillz.TypeFactory}.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited

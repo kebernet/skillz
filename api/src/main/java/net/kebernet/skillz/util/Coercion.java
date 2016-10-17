@@ -21,22 +21,27 @@ import com.google.common.base.Joiner;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @ThreadSafe
+@Singleton
 public class Coercion {
-
+    private static final Logger LOGGER = Logger.getLogger(Coercion.class.getCanonicalName());
     private static final ThreadLocal<String> DATE_OVERRIDE = new ThreadLocal<>();
     private static final Converter<Object, Object> PASSTHROUGH = source -> source;
 
-    private final HashMap<Key, Converter> coercions = new HashMap<>();
+    private final Map<Key, Converter> coercions = new ConcurrentHashMap<>();
     private static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
     { // Instance init
@@ -218,10 +223,17 @@ public class Coercion {
 
     }
 
+    @Inject
     public Coercion(){
         super();
     }
 
+
+    public <S,D> void addConverter(Class<S> source, Class<D> destination, Converter<S,D> converter){
+        if(this.coercions.put(new Key(source, destination), converter) != null){
+            LOGGER.warning("Replacing coercion from "+source.getCanonicalName() +" to " + destination.getCanonicalName());
+        }
+    }
 
     /**
      * Coerce from one type to another
@@ -248,6 +260,7 @@ public class Coercion {
      * @param <D> the destination type
      * @return A destination instance or null;
      */
+    @SuppressWarnings("unchecked")
     public <S,D> D coerce(@Nonnull Class<?> sourceClass, @Nullable S source, @Nonnull Class<D> destination){
         checkNotNull(destination, "You must provide a target class");
         D value = null;
@@ -256,20 +269,20 @@ public class Coercion {
 
         if(source == null){
             return null;
-        } else if(!hasConverter && source != null && sourceClass.isAssignableFrom(destination)){
+        } else if(!hasConverter && sourceClass.isAssignableFrom(destination)) {
             value = (D) source;
-        }else if(destination.isEnum()){
-            if(source instanceof Number){
+        }else if(destination.isEnum()) {
+            if(source instanceof Number) {
                 return destination.getEnumConstants()[((Number)source).intValue()];
             } else {
                 for(D d : destination.getEnumConstants()){
-                    if(d.toString().equalsIgnoreCase(source.toString())){
+                    if(d.toString().equalsIgnoreCase(source.toString())) {
                         return d;
                     }
                 }
                 throw new RuntimeException("Couldn't find enum value for "+source+" on type "+destination.getCanonicalName());
             }
-        } else if(source != null){
+        } else {
             if(String.class.equals(destination) && convert == null){
                 return (D) source.toString();
             }

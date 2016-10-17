@@ -22,11 +22,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Created by rcooper on 10/15/16.
+ * This annotation allows you to document utterances that will be provided for your intent
+ * when the utterances.txt file is requested.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Target(ElementType.METHOD)
 public @interface Utterances {
+    /** One string representing each template utterance value
+     *
+     * @return Array of utterance templates.
+     */
     String[] value();
 }

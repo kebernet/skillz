@@ -33,7 +33,7 @@ import net.kebernet.skillz.FormatterMappings;
 import net.kebernet.skillz.SkillzException;
 import net.kebernet.skillz.TypeFactory;
 import net.kebernet.skillz.annotation.Launched;
-import net.kebernet.skillz.annotation.RequestValue;
+import net.kebernet.skillz.annotation.ExpressionValue;
 import net.kebernet.skillz.annotation.ResponseFormatter;
 import net.kebernet.skillz.annotation.SessionEnded;
 import net.kebernet.skillz.annotation.SessionStarted;
@@ -53,7 +53,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
- * Created by rcooper on 10/15/16.
+ * This is a Speechlet subclass that will delegate to a Skill annotated pojo.
  */
 class DynamicSpeechlet implements Speechlet {
     private static final Logger LOGGER = Logger.getLogger(DynamicSpeechlet.class.getCanonicalName());
@@ -111,6 +111,7 @@ class DynamicSpeechlet implements Speechlet {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private SpeechletResponse invokeResponseEvent(InvokableMethod method, List<ParameterValue> values) {
         try {
             ResponseFormatter declaredFormatter = method.getNativeMethod().getAnnotation(ResponseFormatter.class);
@@ -120,10 +121,10 @@ class DynamicSpeechlet implements Speechlet {
             } else if(declaredFormatter != null) {
                 return (SpeechletResponse) typeFactory.create(declaredFormatter.value()).apply(result);
             } else {
-                return responseMapper.findMappingFunction(result.getClass()).apply(result);
+                return (SpeechletResponse) responseMapper.findMappingFunction(result.getClass()).apply(result);
             }
         } catch (InvokerException e) {
-            throw new SkillzException("Unable to evaluate method : " + method, e);
+            throw new SkillzException("Unable to sevaluate method : " + method, e);
         }
     }
 
@@ -184,7 +185,7 @@ class DynamicSpeechlet implements Speechlet {
                                     "it is handling and IntentRequest.");
                         }
                     }
-                    RequestValue requestValue = param.getParameter().getAnnotation(RequestValue.class);
+                    ExpressionValue requestValue = param.getParameter().getAnnotation(ExpressionValue.class);
                     if (requestValue != null) {
                         return new ParameterValue(param.getName(), evaluate(context, requestValue.value()));
                     }

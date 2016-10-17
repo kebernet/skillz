@@ -22,24 +22,24 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Marks a method parameter as being populated from a slot value.
- * <p>If a parameter is not of a type {@link String} then Skillz will use the
- * {@link net.kebernet.skillz.util.Coercion} class to attempt to convert it to
- * the appropriate value.
+ * ExpressionValue allows you to read from arbitrary values on the request and
+ * session objects. It allows you to write an
+ * <a href="https://en.wikipedia.org/wiki/OGNL">OGNL</a> expression, addressing either
+ * <code>request</code> or <code>session</code> as top level context objects.
+ * <p>
+ * For example, if you wanted to get access to the Alexa Session from your class, you
+ * might say,
+ * </p>
+ * <blockquote>
+ * <pre>
+ *     public String myMethod(@ExpressionValue("session.attributes") Map&lt;String,Object&gt; contextMap) {
+ *          //...
+ * </pre>
+ * </blockquote>
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Target(ElementType.PARAMETER)
-public @interface Slot {
-    /**
-     * The name of the slot to read the parameter value from.
-     * @return The name of the slot.
-     */
-    String name();
-
-    /** The type of the slot. This value is not used at runtime, but will be used to
-     * generate the intents.json structure.
-     * @return
-     */
-    String type() default "";
+public @interface ExpressionValue {
+    String value();
 }

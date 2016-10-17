@@ -22,7 +22,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Created by rcooper on 10/15/16.
+ *  An annotation for a method called called when a session is started.
+ *  <p>Note: You can only have a single method implementation with this annotation per-skill.</p>
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited

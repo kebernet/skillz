@@ -14,6 +14,7 @@
  *    limitations under the License.
  */
 /**
- * This package contains implementation details for the Skillz API.
+ * This package contains implementation details for the Skillz API. You really shouldn't need
+ * to ever reference anything from in here, but you know, knock yourself out.
  */
 package net.kebernet.skillz.impl;

@@ -15,28 +15,55 @@
  */
 package net.kebernet.skillz;
 
-import com.amazon.speech.speechlet.SpeechletResponse;
-
+import javax.inject.Provider;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
 
 /**
- * Created by rcooper on 10/15/16.
+ * A class that contains default Formatter mappings per class type.
  */
 public class FormatterMappings {
 
-    private ConcurrentHashMap<Class<?>, Function<? extends Object, SpeechletResponse>> mappers = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Class<?>, Provider<Formatter<?>>> mappers = new ConcurrentHashMap<>();
 
     public FormatterMappings(){
     }
 
-    public <T> void addMappingFunction(Class<T> type, Function<T, SpeechletResponse> mappingFunction){
-        this.mappers.put(type, mappingFunction);
+    /**
+     * Adds a {@link javax.inject.Provider} to a Formatter for a given return type. This
+     * can be useful if you wish to have dependencies injected into your formatter.
+     * @param type A class reference for the return type to format.
+     * @param provider A Provider that returns an instance of the Formatter for the type.
+     */
+    public void addMappingFunctionProvider(Class<?> type, Provider<Formatter<?>> provider){
+        if(this.mappers.put(type, provider) != null){
+            throw new SkillzException("You have attempted to register two formatters for the type "+
+                type.getCanonicalName());
+        }
     }
 
-    public Function<Object, SpeechletResponse> findMappingFunction(Class<?> type){
-        return (Function<Object, SpeechletResponse>) Optional.ofNullable(mappers.get(type))
-                .orElseThrow(()-> new SkillzException("Could not find mapping function to convert "+type.getCanonicalName()+" to a SpeechletResponse"));
+    /**
+     * Adds a direct reference to a formatter instance for a type.
+     * @param type Class reference of the type to format.
+     * @param formatter The formatter for the given type.
+     */
+    public void addMappingFunction(Class<?> type, Formatter<?> formatter){
+        if(this.mappers.put(type, ()->formatter) != null){
+            throw new SkillzException("You have attempted to register two formatters for the type "+
+                    type.getCanonicalName());
+        }
+    }
+
+    /**
+     * Looks up the formatter for the given type and returns an instance of it.
+     * @param type Class reference of the type to format.
+     * @param <T> The type to format.
+     * @return A formatter to convert the type to a SpeechletResponse.
+     */
+    @SuppressWarnings("unchecked")
+    public  Formatter findMappingFunction(Class<?> type){
+        return Optional.ofNullable(mappers.get(type))
+                .orElseThrow(()-> new SkillzException("Could not find mapping function to convert "+type.getCanonicalName()+" to a SpeechletResponse"))
+                .get();
     }
 }

@@ -22,7 +22,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Created by rcooper on 10/15/16.
+ * An annotation for a method called when a skill is launched by the user for
+ * continuous interactive mode.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited

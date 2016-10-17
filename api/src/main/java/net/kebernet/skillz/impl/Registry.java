@@ -20,7 +20,7 @@ import net.kebernet.invoker.runtime.impl.IntrospectionData;
 import net.kebernet.skillz.SkillzException;
 import net.kebernet.skillz.annotation.Intent;
 import net.kebernet.skillz.annotation.Launched;
-import net.kebernet.skillz.annotation.RequestValue;
+import net.kebernet.skillz.annotation.ExpressionValue;
 import net.kebernet.skillz.annotation.SessionEnded;
 import net.kebernet.skillz.annotation.SessionStarted;
 import net.kebernet.skillz.annotation.Skill;
@@ -59,7 +59,7 @@ public class Registry {
         this.invoker = new Invoker(Registry::createMethodName, Registry::createParameterName);
         types.forEach(this.invoker::registerType);
         types.forEach(this::validateType);
-        LOGGER.fine("Skill introspection complete.");
+        LOGGER.fine("Skill introspection complete. Found "+types.size()+" skills.");
         pathsToClasses = new HashMap<>(types.size());
         types.forEach((c)-> {
             String path = c.getAnnotation(Skill.class).path();
@@ -92,14 +92,14 @@ public class Registry {
     }
 
     public static String createParameterName(Parameter p){
-        if(!checkMaxOneOf(p, Slot.class, RequestValue.class)){
+        if(!checkMaxOneOf(p, Slot.class, ExpressionValue.class)){
             throw new SkillzException(p.getType()+" "+p.getName()+" has more than a single value annotation on it.");
         }
         Slot slot = p.getAnnotation(Slot.class);
         if(slot != null){
             return "slot."+slot.name();
         }
-        RequestValue requestValue = p.getAnnotation(RequestValue.class);
+        ExpressionValue requestValue = p.getAnnotation(ExpressionValue.class);
         if(requestValue != null){
             return requestValue.value();
         }

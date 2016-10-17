@@ -22,7 +22,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Created by rcooper on 10/15/16.
+ * This annotation indicates what intent a method should be used to handle. You can have
+ * multiple methods bound to a single even with differing sets of parameters, and the one that
+ * seems to best fit the data provided will be invoked.
+ * <p>
+ *     For common intent types see also: {@link net.kebernet.skillz.util.AmazonIntents}
+ * </p>
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited

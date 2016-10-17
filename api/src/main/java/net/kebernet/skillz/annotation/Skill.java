@@ -22,11 +22,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Created by rcooper on 10/15/16.
+ * Marks a class as exposing an Alexa skill.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Target(ElementType.TYPE)
 public @interface Skill {
+    /**
+     * The path is should be exposed on. This path will be relative to where you have applied
+     * the {@link net.kebernet.skillz.SkillzFilter}.
+     * @return The final path component to map the skill to.
+     */
     String path();
 }

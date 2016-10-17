@@ -13,20 +13,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package net.kebernet.skillz.annotation;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 /**
- * Created by rcooper on 10/15/16.
+ * Because the core Alexa Skills Kit classes do not include builder or convenience constructors,
+ * this package contains a set of builders to simplify building these types.
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Inherited
-@Target(ElementType.PARAMETER)
-public @interface RequestValue {
-    String value();
-}
+package net.kebernet.skillz.builders;

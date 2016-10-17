@@ -18,27 +18,34 @@ package net.kebernet.skillz.builders;
 import com.amazon.speech.ui.PlainTextOutputSpeech;
 
 /**
- * Created by rcooper on 10/16/16.
+ * A builder for PlainTextOutputSpeech.
+ * <p>
+ *     Example:
+ * <pre>
+ *     PlainTextSpeedOutput output = PlainTextSpeechOutputBuilder.withText("Hello, world.")
+ *                                                               .withId("id:hello")
+ *                                                               .build();
+*  </pre>
+ * </p>
  */
 public class PlainTextOutputBuilder {
 
-    private String text;
-    private String id;
+    private final PlainTextOutputSpeech result = new PlainTextOutputSpeech();
 
     public PlainTextOutputBuilder(String text) {
-        this.text = text;
+        this.result.setText(text);
     }
 
     public PlainTextOutputBuilder withId(String id){
-        this.id = id;
+        this.result.setId(id);
         return this;
     }
 
     public PlainTextOutputSpeech build(){
-        PlainTextOutputSpeech speech = new PlainTextOutputSpeech();
-        speech.setText(text);
-        speech.setId( id == null ? Integer.toString(text.hashCode()) : id);
-        return speech;
+        if(this.result.getId() == null){
+            this.result.setId(Integer.toString(result.getText().hashCode()) );
+        }
+        return this.result;
     }
 
     public static PlainTextOutputBuilder withText(String text){

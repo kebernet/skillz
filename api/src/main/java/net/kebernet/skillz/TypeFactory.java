@@ -18,9 +18,22 @@ package net.kebernet.skillz;
 import javax.inject.Singleton;
 
 /**
- * Created by rcooper on 10/15/16.
+ * This is a simple interfaces that is used to construct new instances of types by
+ * the Skillz API. If you are using a DI framework, this would be the place you hook
+ * that into Skillz to get your classes.
+ * <p>
+ *     This includes skill classes as well as Formatter instances when they are declared
+ *     using {@link net.kebernet.skillz.annotation.ResponseFormatter}.
+ * </p>
+ *
  */
 @Singleton
 public interface TypeFactory {
+    /**
+     * Creates an instance of type T.
+     * @param type Class reference for the type.
+     * @param <T> The type to create.
+     * @return And instance.
+     */
     <T> T create(Class<T> type);
 }

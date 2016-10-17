@@ -13,20 +13,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package net.kebernet.skillz.annotation;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+package net.kebernet.skillz.util;
 
 /**
- *  An annotation for a method called when a session is ended.
- *  <p>Note: You can only have a single method implementation with this annotation per-skill.</p>
+ * Created by rcooper on 10/16/16.
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Inherited
-@Target(ElementType.METHOD)
-public @interface SessionEnded {
+public abstract class AmazonTypes {
 }

@@ -27,17 +27,18 @@ import net.kebernet.skillz.annotation.Utterances;
 public class BurnsAndAllen {
 
     @Launched
+    @ResponseFormatter(Formatters.SimplePlainTextTell.class)
     public String hello(){
         return "Gracie, come look!";
     }
 
     @Intent("GeorgeAndGracie")
     @Utterances({
-            "Say {greeting|goodnight}, {name|gracie}."
+            "Say {greeting|goodnight}, {name}."
     })
     @ResponseFormatter(Formatters.SimplePlainTextTell.class)
     public String say(@Slot(name="greeting", type="AMAZON.LITERAL") String greeting,
-                                 @Slot(name="name", type="AMAZON.LITERAL") String name){
-        return greeting+", "+name;
+                                 @Slot(name="name", type="AMAZON.US_FIRST_NAME") String name){
+        return greeting+" "+name;
     }
 }

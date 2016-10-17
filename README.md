@@ -49,6 +49,13 @@ public class BurnsAndAllen {
 }
 ```
 
+Notes
+-----
+
+Rather than a re-implementation of the Alexa Skills Kit, Skillz is built as a layer on top
+of it. This was done with the belief that it would mean that it would be easier to support
+future changes to the base API without breaking existing skills. 
+
 
 
 
