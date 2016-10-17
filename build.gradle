@@ -28,6 +28,7 @@ allprojects {
 }
 
 subprojects {
+
     apply plugin: 'java'
     sourceCompatibility = 1.8
     task sourcesJar(type: Jar, dependsOn: classes) {
