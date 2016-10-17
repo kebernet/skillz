@@ -22,10 +22,14 @@ import net.kebernet.invoker.runtime.impl.InvokableMethod;
 import net.kebernet.skillz.FormatterMappings;
 import net.kebernet.skillz.TypeFactory;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.logging.Logger;
 
 /**
- * Created by rcooper on 10/15/16.
+ * A subclass of Speechlet Servlet that delegates to the DynamicSpeechlet.
  */
 public class DynamicServlet extends SpeechletServlet {
     private static final Logger LOGGER = Logger.getLogger(DynamicServlet.class.getCanonicalName());
@@ -33,8 +37,10 @@ public class DynamicServlet extends SpeechletServlet {
         final ArrayListMultimap<String, InvokableMethod> methods = ArrayListMultimap.create();
         data.getMethods().forEach(m->methods.put(m.getName(), m));
         this.setSpeechlet(new DynamicSpeechlet(methods, data, responseMapper, registry, implementation, typeFactory));
+     }
 
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        super.doGet(req, resp);
     }
-
-
 }

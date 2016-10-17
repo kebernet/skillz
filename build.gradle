@@ -25,6 +25,13 @@ allprojects {
 
     group 'net.kebernet.skillz'
     version '0.0.1'
+
+    task installGitHooks(type: Copy) {
+        from new File(rootProject.rootDir, '/etc/pre-commit.sh')
+        into { new File(rootProject.rootDir, '.git/hooks') }
+    }
+
+    build.dependsOn installGitHooks
 }
 
 subprojects {
