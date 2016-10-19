@@ -75,7 +75,8 @@ to the ```TypeFactory``` for instantiation, or a ```Provider<T extends Formatter
 implementation.
 
 
-#### Creating Your First Skill
+Creating Your First Skill
+-------------------------
 
 To create a skill you need to annotate a POJO class with the Skillz annotations. This
 will let you take in data from Alexa, and in the end, return a proper ```SpeechletResponse```
