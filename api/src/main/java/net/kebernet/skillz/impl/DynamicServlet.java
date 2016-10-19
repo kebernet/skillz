@@ -16,26 +16,44 @@
 package net.kebernet.skillz.impl;
 
 import com.amazon.speech.speechlet.servlet.SpeechletServlet;
-import com.google.common.collect.ArrayListMultimap;
-import net.kebernet.invoker.runtime.impl.IntrospectionData;
-import net.kebernet.invoker.runtime.impl.InvokableMethod;
-import net.kebernet.skillz.FormatterMappings;
-import net.kebernet.skillz.TypeFactory;
+import com.google.common.base.Strings;
+import net.kebernet.skillz.util.OutputUtterances;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.logging.Logger;
 
 /**
  * A subclass of Speechlet Servlet that delegates to the DynamicSpeechlet.
  */
 public class DynamicServlet extends SpeechletServlet {
-    private static final Logger LOGGER = Logger.getLogger(DynamicServlet.class.getCanonicalName());
+    private static final String UTTERANCES = "utterances";
+    private static final String TEXT_PLAIN = "text/plain";
+    private static final String UTF_8 = "utf-8";
+    private static final String INTENTS = "intents";
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doGet(req, resp);
+        String q = req.getQueryString();
+        if(Strings.isNullOrEmpty(q)){
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+        switch(q) {
+            case UTTERANCES: {
+                DynamicSpeechlet speechlet = (DynamicSpeechlet) getSpeechlet();
+                OutputUtterances output = new OutputUtterances(speechlet.getData());
+                resp.setContentType(TEXT_PLAIN);
+                resp.setCharacterEncoding(UTF_8);
+                output.writeTo(resp.getWriter());
+                break;
+            }
+            case INTENTS: {
+                break;
+            }
+            default:
+                throw new ServletException("What does "+q+" mean??");
+        }
     }
 }

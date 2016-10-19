@@ -74,6 +74,10 @@ public class DynamicSpeechlet implements Speechlet {
         this.typeFactory = typeFactory;
     }
 
+    public IntrospectionData getData() {
+        return data;
+    }
+
     @Override
     public void onSessionStarted(SessionStartedRequest request, Session session) throws SpeechletException {
         handleVoidEvent(SessionStarted.class, request, session);
@@ -212,6 +216,8 @@ public class DynamicSpeechlet implements Speechlet {
         return value;
     }
 
+
+
     private static class MethodEvaluation implements Comparable {
         final InvokableMethod method;
         final List<ParameterValue> values;
@@ -223,7 +229,6 @@ public class DynamicSpeechlet implements Speechlet {
             this.score = score;
         }
 
-        @Override
         public int compareTo(Object o) {
             MethodEvaluation that = (MethodEvaluation) o;
             if (this.score == 0 && that.score == 0) {

@@ -66,6 +66,7 @@ subprojects {
     }
 
     check.dependsOn jacocoTestReport
+    check.dependsOn javadoc
 
     test {
         testLogging {

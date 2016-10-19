@@ -70,5 +70,4 @@ public class FormatterMappingsTest {
         } );
         mappings.findMappingFunction(String.class).apply("bar");
     }
-
 }

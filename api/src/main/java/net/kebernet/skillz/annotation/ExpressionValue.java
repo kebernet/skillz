@@ -35,6 +35,11 @@ import java.lang.annotation.Target;
  *     public String myMethod(@ExpressionValue("session.attributes") Map&lt;String,Object&gt; contextMap) {
  *          //...
  * </pre>
+ * or
+ * <pre>
+ *     public String myMethod(@ExpressionValue("session.attributes.myValue") Map&lt;String,Object&gt; myValue) {
+ *          //...
+ * </pre>
  * </blockquote>
  */
 @Retention(RetentionPolicy.RUNTIME)

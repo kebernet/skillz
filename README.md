@@ -12,7 +12,6 @@ NOTICE
 
 This project is currently under development and not intended for use.
 
-
 Purpose
 -------
 
@@ -21,7 +20,8 @@ Java.
 
 The Alexa Skills Kit provided by Amazon is fine, but it feels... less than modern... in the Java world.
 Skillz provides a new method for developing Alexa skills built on top of the Amazon kit, but more in the
-style of JAX-RS and other meta-data based frameworks.
+style of JAX-RS and other meta-data based frameworks. This makes skills easier to develop, and easier to
+test!
 
 Rather than implementing a Speechlet and configuring a servlet to handle it, you can simple annotate a class
 and have the invocation of your methods handled by the Skillz framework. For example:
@@ -50,6 +50,14 @@ public class BurnsAndAllen {
     }
 }
 ```
+
+First Steps
+-----------
+
+See the [API subproject docs](api/README.md) for help getting started.
+
+If you want to quickstart a [DropWizard project](dropwizard/README.md) you can
+look at the module for Skillz.
 
 Notes
 -----
