@@ -184,11 +184,15 @@ Let's take a look at a simple class:
       defined all that in our classes! To get the information, simply start your
       container and request:
       
-      ```https://hostname/searchMyStuffSkill?utterances```
+      ```
+      https://hostname/searchMyStuffSkill?utterances
+      ```
       
       to get the utterances text, or 
       
-      ```https://hostname/searchMyStuffSkill?intents```
+      ```
+      https://hostname/searchMyStuffSkill?intents
+      ```
       
       to get your Intents and Slot definitions. 
       
