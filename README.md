@@ -10,7 +10,7 @@ Girls only like guys who have great skills."_
 NOTICE
 ------
 
-This project is currently under development and not intended for use.
+This project is currently under development and not intended for use. 
 
 Purpose
 -------
