@@ -43,7 +43,7 @@ It requires:
 
 ```Registry``` is the internal registry of skill classes. If you simply construct one
 with the no-args constructor, it should be fine, and this constructor is annotated with
-```@Inject```. 
+```@Inject``` . 
 
 ```TypeFactory``` is the Skillz-specific abstraction used for constructing new 
 instances of classes. You will want to provide an implementation of this appropriate
