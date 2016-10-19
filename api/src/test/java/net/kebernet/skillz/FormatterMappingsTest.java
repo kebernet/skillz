@@ -15,25 +15,60 @@
  */
 package net.kebernet.skillz;
 
+import com.amazon.speech.speechlet.SpeechletResponse;
+import com.amazon.speech.ui.PlainTextOutputSpeech;
+import net.kebernet.skillz.builder.PlainTextOutputBuilder;
 import org.junit.Test;
+
 
 import static org.junit.Assert.*;
 
+@SuppressWarnings("unchecked")
 public class FormatterMappingsTest {
 
     @Test
     public void addMappingFunctionProvider() throws Exception {
-
+        FormatterMappings mappings = new FormatterMappings();
+        mappings.addMappingFunctionProvider(String.class, ()->{
+            Formatter f = (String)-> SpeechletResponse.newTellResponse(
+                PlainTextOutputBuilder.withText("foo").build()
+            );
+            return f;
+        } );
+        SpeechletResponse response = (SpeechletResponse) mappings.findMappingFunction(String.class).apply("bar");
+        assertEquals("foo", ((PlainTextOutputSpeech) response.getOutputSpeech()).getText());
     }
 
     @Test
     public void addMappingFunction() throws Exception {
+        FormatterMappings mappings = new FormatterMappings();
+        mappings.addMappingFunction(String.class,  (String)-> SpeechletResponse.newTellResponse(
+                PlainTextOutputBuilder.withText("foo").build()
+        ));
+        SpeechletResponse response = (SpeechletResponse) mappings.findMappingFunction(String.class).apply("bar");
+        assertEquals("foo", ((PlainTextOutputSpeech) response.getOutputSpeech()).getText());
+    }
+
+    @Test(expected = SkillzException.class)
+    public void addMappingFunctionMiss() throws Exception {
+        FormatterMappings mappings = new FormatterMappings();
+        mappings.addMappingFunction(Integer.class,  (String)-> SpeechletResponse.newTellResponse(
+                PlainTextOutputBuilder.withText("foo").build()
+        ));
+        mappings.findMappingFunction(String.class).apply("bar");
 
     }
 
-    @Test
-    public void findMappingFunction() throws Exception {
-
+    @Test(expected = SkillzException.class)
+    public void addMappingFunctionProviderMiss() throws Exception {
+        FormatterMappings mappings = new FormatterMappings();
+        mappings.addMappingFunctionProvider(Integer.class, ()->{
+            Formatter f = (String)-> SpeechletResponse.newTellResponse(
+                    PlainTextOutputBuilder.withText("foo").build()
+            );
+            return f;
+        } );
+        mappings.findMappingFunction(String.class).apply("bar");
     }
 
 }

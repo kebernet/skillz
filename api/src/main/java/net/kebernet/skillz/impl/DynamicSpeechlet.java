@@ -55,7 +55,7 @@ import java.util.stream.Collectors;
 /**
  * This is a Speechlet subclass that will delegate to a Skill annotated pojo.
  */
-class DynamicSpeechlet implements Speechlet {
+public class DynamicSpeechlet implements Speechlet {
     private static final Logger LOGGER = Logger.getLogger(DynamicSpeechlet.class.getCanonicalName());
     private static final Coercion coersion = new Coercion();
     private final ArrayListMultimap<String, InvokableMethod> methods;
@@ -231,6 +231,26 @@ class DynamicSpeechlet implements Speechlet {
             } else {
                 return Integer.compare(that.score, this.score);
             }
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof MethodEvaluation)) return false;
+
+            MethodEvaluation that = (MethodEvaluation) o;
+
+            if (score != that.score) return false;
+            if (method != null ? !method.equals(that.method) : that.method != null) return false;
+            return values != null ? values.equals(that.values) : that.values == null;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = method.hashCode();
+            result = 31 * result + values.hashCode();
+            result = 31 * result + score;
+            return result;
         }
     }
 }

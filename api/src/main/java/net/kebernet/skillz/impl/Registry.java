@@ -41,7 +41,8 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
- * Created by rcooper on 10/15/16.
+ *  This is the class that managed discovery and metadata for the Skill implementations.
+ *
  */
 @Singleton
 public class Registry {
@@ -50,24 +51,39 @@ public class Registry {
     private final Invoker invoker;
     private final Map<String, Class<?>> pathsToClasses;
 
+
+    public Registry(Set<Class<?>> types){
+        this.invoker = new Invoker(Registry::createMethodName, Registry::createParameterName);
+        this.pathsToClasses = new HashMap<>(types.size());
+        init(types);
+    }
+
+    /**
+     * Default constructor that uses Reflections to search for skills on the
+     * classpath.
+     */
     @Inject
     public Registry(){
         LOGGER.fine("Beginning scan for skills.");
         Reflections reflections = new Reflections(Thread.currentThread().getContextClassLoader());
         Set<Class<?>> types = reflections.getTypesAnnotatedWith(Skill.class);
-        LOGGER.fine("Scan for skills complete.");
         this.invoker = new Invoker(Registry::createMethodName, Registry::createParameterName);
+        this.pathsToClasses = new HashMap<>(types.size());
+        LOGGER.fine("Scan for skills complete.");
+        init(types);
+    }
+
+    private void init(Set<Class<?>> types) {
         types.forEach(this.invoker::registerType);
         types.forEach(this::validateType);
         LOGGER.fine("Skill introspection complete. Found "+types.size()+" skills.");
-        pathsToClasses = new HashMap<>(types.size());
         types.forEach((c)-> {
             String path = c.getAnnotation(Skill.class).path();
             Class<?> previous = pathsToClasses.put(path, c);
             if(previous != null){
                 // TODO, allow multiple implemetnations to handle different intents.
                 throw new SkillzException("Both "+previous.getCanonicalName()+" and "+
-                    c.getCanonicalName()+" are attempting to register for '"+path+"'");
+                        c.getCanonicalName()+" are attempting to register for '"+path+"'");
             }
         });
     }

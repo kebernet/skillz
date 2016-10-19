@@ -15,20 +15,36 @@
  */
 package net.kebernet.skillz.test;
 
-import net.kebernet.skillz.util.Formatters;
 import net.kebernet.skillz.annotation.Intent;
 import net.kebernet.skillz.annotation.Launched;
 import net.kebernet.skillz.annotation.ResponseFormatter;
+import net.kebernet.skillz.annotation.SessionEnded;
+import net.kebernet.skillz.annotation.SessionStarted;
 import net.kebernet.skillz.annotation.Skill;
 import net.kebernet.skillz.annotation.Slot;
 import net.kebernet.skillz.annotation.Utterances;
+import net.kebernet.skillz.util.AmazonSlotTypes;
+import net.kebernet.skillz.util.Formatters;
 
-@Skill(path="/burnsallen")
+@Skill(path = "/burnsallen")
 public class BurnsAndAllen {
+
+    public static final String EXPECTED_UTTERANCES =
+            "GeorgeAndGracie Say {greeting|goodnight}, {name}.\n";
+
+    @SessionStarted
+    public void begin() {
+
+    }
+
+    @SessionEnded
+    public void end() {
+
+    }
 
     @Launched
     @ResponseFormatter(Formatters.SimplePlainTextTell.class)
-    public String hello(){
+    public String hello() {
         return "Gracie, come look!";
     }
 
@@ -37,8 +53,8 @@ public class BurnsAndAllen {
             "Say {greeting|goodnight}, {name}."
     })
     @ResponseFormatter(Formatters.SimplePlainTextTell.class)
-    public String say(@Slot(name="greeting", type="AMAZON.LITERAL") String greeting,
-                                 @Slot(name="name", type="AMAZON.US_FIRST_NAME") String name){
-        return greeting+" "+name;
+    public String say(@Slot(name = "greeting", type = AmazonSlotTypes.LITERAL) String greeting,
+                      @Slot(name = "name", type = AmazonSlotTypes.UnitedStates.FIRST_NAME) String name) {
+        return greeting + " " + name;
     }
 }

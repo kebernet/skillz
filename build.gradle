@@ -30,6 +30,8 @@ allprojects {
 subprojects {
 
     apply plugin: 'java'
+    apply plugin: 'findbugs'
+    apply plugin: "jacoco"
 
     sourceCompatibility = 1.8
     task sourcesJar(type: Jar, dependsOn: classes) {
@@ -53,6 +55,35 @@ subprojects {
     }
 
     build.dependsOn installGitHooks
+
+
+    jacocoTestReport {
+        reports {
+            xml.enabled false
+            csv.enabled false
+            html.destination "${buildDir}/reports/jacoco"
+        }
+    }
+
+    check.dependsOn jacocoTestReport
+
+    test {
+        testLogging {
+            events "passed", "skipped", "failed", "standardOut", "standardError"
+        }
+        jacoco {
+            append = false
+            destinationFile = file("$buildDir/jacoco/jacocoTest.exec")
+            classDumpFile = file("$buildDir/jacoco/classpathdumps")
+        }
+    }
+
+    tasks.withType(FindBugs) {
+        reports {
+            xml.enabled false
+            html.enabled true
+        }
+    }
 
 }
 

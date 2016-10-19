@@ -16,8 +16,14 @@
 package net.kebernet.skillz;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.ArrayListMultimap;
 import net.kebernet.invoker.runtime.impl.IntrospectionData;
+import net.kebernet.invoker.runtime.impl.InvokableMethod;
+import net.kebernet.skillz.impl.DefaultTypeFactory;
+import net.kebernet.skillz.impl.DynamicServlet;
+import net.kebernet.skillz.impl.DynamicSpeechlet;
 import net.kebernet.skillz.impl.Registry;
+import net.kebernet.skillz.util.Pool;
 
 import javax.inject.Inject;
 import javax.servlet.Filter;
@@ -39,15 +45,46 @@ import java.util.logging.Logger;
  */
 public class SkillzFilter implements Filter {
     private static final Logger LOGGER = Logger.getLogger(SkillzFilter.class.getCanonicalName());
+    private final Pool<DynamicServlet> pool;
     private final TypeFactory factory;
     private final Registry registry;
+    private final FormatterMappings mappings;
 
+
+    /**
+     * The standard Dependency-Injected constructor.
+     * @param registry The registry to use.
+     * @param factory The TypeFactory to build instances with.
+     * @param mappings FormatterMappings for building SpeechletResponses
+     */
     @Inject
-    public SkillzFilter(TypeFactory factory, FormatterMappings responseBuilder){
+    public SkillzFilter(Registry registry, TypeFactory factory, FormatterMappings mappings){
         this.factory = factory;
-        this.registry = new Registry();
+        this.registry = registry;
+        this.mappings = mappings;
+        this.pool =  new Pool<>(factory, DynamicServlet.class, 512);
     }
 
+
+    /**
+     *  For simple JavaEE type usage, the default constructor will create a registry,
+     *  a DefaultTypeFactory, and a FormatterMappings instance for the filter.
+     */
+    public SkillzFilter(){
+        this(new Registry(), new DefaultTypeFactory(), new FormatterMappings());
+    }
+
+    public Registry getRegistry(){
+        return registry;
+    }
+
+    public TypeFactory getFactory(){
+        return factory;
+    }
+
+    public FormatterMappings getMappings(){
+        return mappings;
+    }
 
     public void init(FilterConfig filterConfig) throws ServletException {
 
@@ -58,15 +95,33 @@ public class SkillzFilter implements Filter {
         HttpServletResponse response = (HttpServletResponse) res;
 
         String path = request.getPathInfo();
+        LOGGER.finer("Checking for Skill at "+path);
         if(!Strings.isNullOrEmpty(path)){
             Optional<IntrospectionData> handler = registry.getDataForPath(path);
             if(!handler.isPresent()){ // Nothing to handle.
                 chain.doFilter(request, response);
                 return;
             }
+
+            IntrospectionData data = handler.get();
+            LOGGER.fine("Handling skill request for "+path+" with "+data.getType());
+            Object instance = factory.create(data.getType());
+            final ArrayListMultimap<String, InvokableMethod> methods = ArrayListMultimap.create();
+            data.getMethods().forEach(m->methods.put(m.getName(), m));
+
+            // Check a servlet out and invoke it.
+            DynamicSpeechlet speechlet = new DynamicSpeechlet(methods, data, mappings, registry, instance, factory);
+            DynamicServlet servlet;
+            try {
+                servlet = pool.checkout();
+                servlet.setSpeechlet(speechlet);
+                servlet.service(req, res);
+                servlet.setSpeechlet(null);
+            } catch (RuntimeException e) {
+                throw new ServletException(e);
+            }
+            pool.checkin(servlet);
         }
-
-
     }
 
     public void destroy() {

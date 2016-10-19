@@ -17,7 +17,7 @@ package net.kebernet.skillz.util;
 
 import com.amazon.speech.speechlet.SpeechletResponse;
 import net.kebernet.skillz.Formatter;
-import net.kebernet.skillz.builders.PlainTextOutputBuilder;
+import net.kebernet.skillz.builder.PlainTextOutputBuilder;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;

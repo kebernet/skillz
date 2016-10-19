@@ -22,21 +22,22 @@ package net.kebernet.skillz.util;
  *     <a href="https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/implementing-the-built-in-intents#available-built-in-intents">the official docs</a>.
  * </p>
  */
+@SuppressWarnings("unused")
 public abstract class AmazonIntents {
 
-    public String CANCEL = "AMAZON.CancelIntent";
-    public String HELP = "AMAZON.HelpIntent";
-    public String LOOP_OFF = "AMAZON.LoopOffIntent";
-    public String LOOP_ON = "AMAZON.LoopOnIntent";
-    public String NEXT = "AMAZON.NextIntent";
-    public String NO = "AMAZON.NoIntent";
-    public String PAUSE = "AMAZON.PauseIntent";
-    public String PREVIOUS = "AMAZON.PreviousIntent";
-    public String REPEAT = "AMAZON.RepeatIntent";
-    public String RESUME = "AMAZON.ResumeIntent";
-    public String SHUFFLE_OFF = "AMAZON.ShuffleOffIntent";
-    public String SHUFFLE_ON = "AMAZON.ShuffleOnIntent";
-    public String START_OVER = "AMAZON.StartOverIntent";
-    public String STOP = "AMAZON.StopIntent";
-    public String YES = "AMAZON.YesIntent";
+    public static final String CANCEL = "AMAZON.CancelIntent";
+    public static final String HELP = "AMAZON.HelpIntent";
+    public static final String LOOP_OFF = "AMAZON.LoopOffIntent";
+    public static final String LOOP_ON = "AMAZON.LoopOnIntent";
+    public static final String NEXT = "AMAZON.NextIntent";
+    public static final String NO = "AMAZON.NoIntent";
+    public static final String PAUSE = "AMAZON.PauseIntent";
+    public static final String PREVIOUS = "AMAZON.PreviousIntent";
+    public static final String REPEAT = "AMAZON.RepeatIntent";
+    public static final String RESUME = "AMAZON.ResumeIntent";
+    public static final String SHUFFLE_OFF = "AMAZON.ShuffleOffIntent";
+    public static final String SHUFFLE_ON = "AMAZON.ShuffleOnIntent";
+    public static final String START_OVER = "AMAZON.StartOverIntent";
+    public static final String STOP = "AMAZON.StopIntent";
+    public static final String YES = "AMAZON.YesIntent";
 }

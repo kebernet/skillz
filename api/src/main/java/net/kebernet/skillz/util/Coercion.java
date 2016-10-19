@@ -17,6 +17,7 @@ package net.kebernet.skillz.util;
 
 
 import com.google.common.base.Joiner;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -75,6 +76,7 @@ public class Coercion {
         coercions.put(key, new Converter<String, Boolean>(){
 
             @Override
+            @SuppressFBWarnings("NP_BOOLEAN_RETURN_NULL")
             public Boolean convert(String source) {
                 if(source == null || source.trim().isEmpty()){
                     return null;

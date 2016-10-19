@@ -33,11 +33,6 @@ import java.util.logging.Logger;
  */
 public class DynamicServlet extends SpeechletServlet {
     private static final Logger LOGGER = Logger.getLogger(DynamicServlet.class.getCanonicalName());
-    public DynamicServlet(final FormatterMappings responseMapper, final Registry registry, final Object implementation, final IntrospectionData data, final TypeFactory typeFactory){
-        final ArrayListMultimap<String, InvokableMethod> methods = ArrayListMultimap.create();
-        data.getMethods().forEach(m->methods.put(m.getName(), m));
-        this.setSpeechlet(new DynamicSpeechlet(methods, data, responseMapper, registry, implementation, typeFactory));
-     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

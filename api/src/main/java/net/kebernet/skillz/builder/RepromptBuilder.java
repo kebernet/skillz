@@ -13,10 +13,22 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package net.kebernet.skillz.util;
+package net.kebernet.skillz.builder;
+
+import com.amazon.speech.ui.OutputSpeech;
+import com.amazon.speech.ui.Reprompt;
 
 /**
- * Created by rcooper on 10/16/16.
+ * Created by rcooper on 10/18/16.
  */
-public abstract class AmazonTypes {
+public class RepromptBuilder {
+
+    private RepromptBuilder(){
+    }
+
+    public static Reprompt withOutputSpeech(OutputSpeech speech){
+        Reprompt result = new Reprompt();
+        result.setOutputSpeech(speech);
+        return result;
+    }
 }

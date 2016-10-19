@@ -40,12 +40,12 @@ public class BurnsAndAllen {
 
     @Intent("GeorgeAndGracie")  //<- No more switching for events.
     @Utterances({
-            "Say {greeting|goodnight}, {name|gracie}." // <- Keep all your metadata with your code!
+            "Say {greeting|goodnight}, {name}." // <- Keep all your metadata with your code!
     })
     @ResponseFormatter(Formatters.SimplePlainTextTell.class)
     public String say(
-        @Slot(name="greeting", type="AMAZON.LITERAL") String greeting, //<- Get slots/values passed as parameters
-        @Slot(name="name", type="AMAZON.LITERAL") String name){
+        @Slot(name="greeting", type=AmazonSlotTypes.LITERAL) String greeting, //<- Get slots/values passed as parameters
+        @Slot(name="name", type=AmazonSlotTypes.UnitedStates.FIRST_NAME) String name){
         return greeting+", "+name;
     }
 }

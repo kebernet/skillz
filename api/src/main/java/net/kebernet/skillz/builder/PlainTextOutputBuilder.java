@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package net.kebernet.skillz.builders;
+package net.kebernet.skillz.builder;
 
 import com.amazon.speech.ui.PlainTextOutputSpeech;
 
@@ -33,7 +33,7 @@ public class PlainTextOutputBuilder {
 
     private final PlainTextOutputSpeech result = new PlainTextOutputSpeech();
 
-    public PlainTextOutputBuilder(String text) {
+    private PlainTextOutputBuilder(String text) {
         this.result.setText(text);
     }
 

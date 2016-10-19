@@ -13,8 +13,23 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package net.kebernet.skillz.impl;
+
+import net.kebernet.skillz.SkillzException;
+import net.kebernet.skillz.TypeFactory;
+
 /**
- * Because the core Alexa Skills Kit classes do not include builder or convenience constructors,
- * this package contains a set of builders to simplify building these types.
+ *  A default implementation of TypeFactory that builds everything assuming there
+ *  is a no-args constructor.
  */
-package net.kebernet.skillz.builders;
+public class DefaultTypeFactory implements TypeFactory {
+
+    @Override
+    public <T> T create(Class<T> type) {
+        try {
+            return type.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new SkillzException("Unable to create type "+type.getCanonicalName()+" with no-args constructor.", e);
+        }
+    }
+}
