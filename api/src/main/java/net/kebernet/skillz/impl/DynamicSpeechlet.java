@@ -51,7 +51,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -59,7 +58,7 @@ import java.util.stream.Stream;
  */
 public class DynamicSpeechlet implements Speechlet {
     private static final Logger LOGGER = Logger.getLogger(DynamicSpeechlet.class.getCanonicalName());
-    private static final Coercion coersion = new Coercion();
+    private static final Coercion COERCION = new Coercion();
     private final ArrayListMultimap<String, InvokableMethod> methods;
     private final IntrospectionData data;
     private final Registry registry;
@@ -193,7 +192,7 @@ public class DynamicSpeechlet implements Speechlet {
                     IntentRequest ir = (IntentRequest) request;
                     com.amazon.speech.slu.Slot slot = ir.getIntent().getSlot(slotAnnotation.name());
                     return slot == null ? Stream.empty() :
-                            Stream.of(new ParameterValue(param.getName(), coersion.coerce(slot.getValue(), param.getType())));
+                            Stream.of(new ParameterValue(param.getName(), COERCION.coerce(slot.getValue(), param.getType())));
                 } catch (ClassCastException e) {
                     throw new SkillzException(data.getType().getCanonicalName() + "." + method.getNativeMethod().getName() + " cannot declare a slot unless " +
                             "it is handling and IntentRequest.");
@@ -202,7 +201,7 @@ public class DynamicSpeechlet implements Speechlet {
             ExpressionValue requestValue = param.getParameter().getAnnotation(ExpressionValue.class);
             if (requestValue != null) {
                 Object value = evaluate(context, requestValue.value());
-                return Stream.of(new ParameterValue(param.getName(), coersion.coerce(value, param.getType())));
+                return Stream.of(new ParameterValue(param.getName(), COERCION.coerce(value, param.getType())));
             }
             return Stream.empty();
         })

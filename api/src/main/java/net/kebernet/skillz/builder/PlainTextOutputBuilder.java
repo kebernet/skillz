@@ -42,6 +42,7 @@ public class PlainTextOutputBuilder {
      * @param id The id
      * @return The builder
      */
+    @SuppressWarnings("unused")
     public PlainTextOutputBuilder withId(String id){
         this.result.setId(id);
         return this;

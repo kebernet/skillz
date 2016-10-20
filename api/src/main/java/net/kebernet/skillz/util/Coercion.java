@@ -156,7 +156,7 @@ public class Coercion {
                 if (source == null) {
                     return null;
                 } else {
-                    return Long.valueOf(source.getTime());
+                    return source.getTime();
                 }
             }
         });
@@ -233,6 +233,7 @@ public class Coercion {
     }
 
 
+    @SuppressWarnings("unused")
     public <S,D> void addConverter(Class<S> source, Class<D> destination, Converter<S,D> converter){
         if(this.coercions.put(new Key(source, destination), converter) != null){
             LOGGER.warning("Replacing coercion from "+source.getCanonicalName() +" to " + destination.getCanonicalName());
@@ -264,11 +265,11 @@ public class Coercion {
      * @param <D> the destination type
      * @return A destination instance or null;
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "WeakerAccess"})
     public <S,D> D coerce(@Nonnull Class<?> sourceClass, @Nullable S source, @Nonnull Class<D> destination){
         checkNotNull(destination, "You must provide a target class");
         destination = (Class<D>) noPrimitives(destination);
-        D value = null;
+        D value;
         Converter<S, D> convert = null;
         boolean hasConverter = source != null && (convert = coercions.get(new Key(sourceClass, destination))) != null;
 
@@ -297,7 +298,7 @@ public class Coercion {
         return value;
     }
 
-    private  Class<?> noPrimitives(Class<?> destination) {
+    private static Class<?> noPrimitives(Class<?> destination) {
         if(!destination.isPrimitive()){
             return destination;
         }
@@ -325,7 +326,7 @@ public class Coercion {
         throw new RuntimeException("Unhandled primitive type "+destination.getCanonicalName());
     }
 
-    public static String getDatePattern(){
+    private static String getDatePattern(){
         if(DATE_OVERRIDE.get() != null){
             return DATE_OVERRIDE.get();
         } else {
@@ -337,6 +338,7 @@ public class Coercion {
      * Sets a *ThreadLocal* date format for use in coercing dates.
      * @param format The new DateFormat.
      */
+    @SuppressWarnings("unused")
     public static void setDateOverride(String format){
         if(format == null){
             DATE_OVERRIDE.remove();
@@ -373,10 +375,8 @@ public class Coercion {
 
             Key key = (Key) o;
 
-            if (!destination.equals(key.destination)) return false;
-            if (!source.equals(key.source)) return false;
+            return destination.equals(key.destination) && source.equals(key.source);
 
-            return true;
         }
 
         @Override
