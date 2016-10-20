@@ -16,15 +16,14 @@
 package net.kebernet.skillz.dropwizard;
 
 import com.google.common.io.Resources;
+import io.dropwizard.testing.junit.ResourceTestRule;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-/**
- * Created by rcooper on 10/20/16.
- */
 public class SkillzBundleTest {
 
     private static Thread serverThread;
