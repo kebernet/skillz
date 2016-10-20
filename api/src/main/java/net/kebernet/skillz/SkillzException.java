@@ -20,14 +20,26 @@ package net.kebernet.skillz;
  */
 public class SkillzException extends RuntimeException {
 
+    /**
+     * Default constructor
+     */
     public SkillzException() {
         super();
     }
 
+    /**
+     * Constructor with message
+     * @param message The message
+     */
     public SkillzException(String message) {
         super(message);
     }
 
+    /**
+     * Constructor with message and cause
+     * @param message The message
+     * @param cause The cause
+     */
     public SkillzException(String message, Throwable cause) {
         super(message, cause);
     }

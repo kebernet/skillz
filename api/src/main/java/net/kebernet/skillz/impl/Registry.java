@@ -135,12 +135,12 @@ public class Registry {
 
         SessionStarted sessionStarted = m.getAnnotation(SessionStarted.class);
         if(sessionStarted != null){
-            return sessionStarted.getClass().getSimpleName();
+            return SessionStarted.class.getSimpleName();
         }
 
         SessionEnded sessionEnded = m.getAnnotation(SessionEnded.class);
         if(sessionEnded != null){
-            return sessionEnded.getClass().getSimpleName();
+            return SessionEnded.class.getSimpleName();
         }
 
         Launched launched = m.getAnnotation(Launched.class);

@@ -35,6 +35,9 @@ import java.util.logging.Logger;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ *  A class for converting between different concrete types.
+ */
 @ThreadSafe
 @Singleton
 public class Coercion {
@@ -192,20 +195,19 @@ public class Coercion {
                 }
             }
         });
-        Converter<Object, String> toStringConverter =  new Converter<Object,String>() {
-            @Override
-            public String convert(@Nullable Object source) {
-                if(source == null){
-                    return null;
-                }
-                return source.toString();
+        Converter<Object, String> toStringConverter = source -> {
+            if(source == null){
+                return null;
             }
+            return source.toString();
         };
+        Converter<String, Long> longFromString = source -> source == null ? null : Long.valueOf(source);
         coercions.put(new Key(Integer.class, String.class), toStringConverter);
         coercions.put(new Key(Long.class, String.class), toStringConverter);
         coercions.put(new Key(Double.class, String.class), toStringConverter);
         coercions.put(new Key(Float.class, String.class), toStringConverter);
         coercions.put(new Key(Boolean.class, String.class), toStringConverter);
+        coercions.put(new Key(String.class, Long.class), longFromString);
         coercions.put(new Key(int.class, Integer.class), PASSTHROUGH);
         coercions.put(new Key(long.class, Long.class), PASSTHROUGH);
         coercions.put(new Key(float.class, Float.class), PASSTHROUGH);
@@ -265,6 +267,7 @@ public class Coercion {
     @SuppressWarnings("unchecked")
     public <S,D> D coerce(@Nonnull Class<?> sourceClass, @Nullable S source, @Nonnull Class<D> destination){
         checkNotNull(destination, "You must provide a target class");
+        destination = (Class<D>) noPrimitives(destination);
         D value = null;
         Converter<S, D> convert = null;
         boolean hasConverter = source != null && (convert = coercions.get(new Key(sourceClass, destination))) != null;
@@ -292,6 +295,34 @@ public class Coercion {
             return convert.convert(source);
         }
         return value;
+    }
+
+    private  Class<?> noPrimitives(Class<?> destination) {
+        if(!destination.isPrimitive()){
+            return destination;
+        }
+        if(destination == Long.TYPE){
+            return Long.class;
+        }
+        if(destination == Integer.TYPE){
+            return Integer.class;
+        }
+        if(destination == Boolean.TYPE){
+            return Boolean.class;
+        }
+        if(destination == Character.TYPE){
+            return Character.class;
+        }
+        if(destination == Byte.TYPE){
+            return Byte.class;
+        }
+        if(destination == Float.TYPE){
+            return Float.class;
+        }
+        if(destination == Double.TYPE){
+            return Double.class;
+        }
+        throw new RuntimeException("Unhandled primitive type "+destination.getCanonicalName());
     }
 
     public static String getDatePattern(){

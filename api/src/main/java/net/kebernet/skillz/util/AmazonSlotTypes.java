@@ -29,27 +29,42 @@ public abstract class AmazonSlotTypes {
     public static final String LITERAL = "AMAZON.LITERAL";
 
 
+    /**
+     * Austria focused slot types.
+     */
     public static abstract class Austria {
         public static final String CITY = "AMAZON.AT_CITY";
         public static final String REGION = "AMAZON.AT_REGION";
     }
 
+    /**
+     * Germany focused slot types.
+     */
     public static abstract class Germany {
         public static final String CITY = "AMAZON.DE_CITY";
         public static final String FIRST_NAME = "AMAZON.DE_FIRST_NAME";
         public static final String REGION = "AMAZON.DE_REGION";
     }
 
+    /**
+     * Europe focused slot types.
+     */
     public static abstract class Europe {
         public static final String CITY = "AMAZON.EUROPE_CITY";
     }
 
+    /**
+     * United Kingdom focused slot types.
+     */
     public static abstract class UnitedKingdom {
         public static final String CITY = "AMAZON.GB_CITY";
         public static final String FIRST_NAME = "AMAZON.GB_FIRST_NAME";
         public static final String REGION = "AMAZON.GB_REGION";
     }
 
+    /**
+     * United States focused slot types.
+     */
     public static abstract class UnitedStates {
         public static final String CITY = "AMAZON.US_CITY";
         public static final String FIRST_NAME = "AMAZON.US_FIRST_NAME";

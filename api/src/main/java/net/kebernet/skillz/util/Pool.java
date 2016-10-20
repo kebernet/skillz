@@ -62,6 +62,11 @@ public class Pool<T> {
         this(factory, type, count, 15, TimeUnit.SECONDS);
     }
 
+    /**
+     * Check an object out of the pool. If the timeout elapses it will throw a
+     * runtime exception.
+     * @return Object from the pool.
+     */
     public T checkout(){
         T value = null;
         try {
@@ -75,6 +80,10 @@ public class Pool<T> {
         return value;
     }
 
+    /**
+     * Retunrs an object to the pool.
+     * @param value Value to return to the pool.
+     */
     public void checkin(T value){
         if(queue.remainingCapacity() == 0){
             throw new RuntimeException("Attempt to check into a full pool.");

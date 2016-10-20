@@ -45,6 +45,9 @@ import java.util.logging.Logger;
  */
 public class SkillzFilter implements Filter {
     private static final Logger LOGGER = Logger.getLogger(SkillzFilter.class.getCanonicalName());
+    /** We are pooling servlet instances so that we don't run into threading issues replacing the
+     * speechlet on the servlet per request. This may need to be configurable in the future.
+     */
     private final Pool<DynamicServlet> pool;
     private final TypeFactory factory;
     private final Registry registry;
@@ -62,7 +65,7 @@ public class SkillzFilter implements Filter {
         this.factory = factory;
         this.registry = registry;
         this.mappings = mappings;
-        this.pool =  new Pool<>(factory, DynamicServlet.class, 512);
+        this.pool =  new Pool<>(factory, DynamicServlet.class, 128);
     }
 
 
@@ -70,26 +73,32 @@ public class SkillzFilter implements Filter {
      *  For simple JavaEE type usage, the default constructor will create a registry,
      *  a DefaultTypeFactory, and a FormatterMappings instance for the filter.
      */
+    @SuppressWarnings("unused")
     public SkillzFilter(){
         this(new Registry(), new DefaultTypeFactory(), new FormatterMappings());
     }
 
+    @SuppressWarnings("unused")
     public Registry getRegistry(){
         return registry;
     }
 
+    @SuppressWarnings("unused")
     public TypeFactory getFactory(){
         return factory;
     }
 
+    @SuppressWarnings("unused")
     public FormatterMappings getMappings(){
         return mappings;
     }
 
+    @Override
     public void init(FilterConfig filterConfig) throws ServletException {
 
     }
 
+    @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
@@ -114,16 +123,17 @@ public class SkillzFilter implements Filter {
             DynamicServlet servlet;
             try {
                 servlet = pool.checkout();
-                servlet.setSpeechlet(speechlet);
-                servlet.service(req, res);
-                servlet.setSpeechlet(null);
             } catch (RuntimeException e) {
                 throw new ServletException(e);
             }
+            servlet.setSpeechlet(speechlet);
+            servlet.service(req, res);
+            servlet.setSpeechlet(null);
             pool.checkin(servlet);
         }
     }
 
+    @Override
     public void destroy() {
 
     }

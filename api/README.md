@@ -1,11 +1,26 @@
-API
-===
+Skills API
+==========
 
 This contains the core Skillz API classes, and everything you should need to create
 a simple JavaEE/Servlet-based implementation of an Alexa skill.
 
 Getting Started
 ---------------
+
+### Review the Amazon docs. 
+
+This will make your life a lot easier. 
+
+[https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/](https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/)
+
+We will not be covering the whys and wherefores here. We are assuming you understand how
+the ASK works and what the components of a skill are.
+
+
+### Dependencies
+
+
+
 
 ### Configuring for JavaEE/Simple Servlets
 
@@ -41,8 +56,7 @@ It requires:
 
 ```Registry registry, TypeFactory factory, FormatterMappings mappings```
 
-```Registry``` is the internal registry of skill classes. If you simply construct one
-with the no-args constructor, it should be fine, and this constructor is annotated with
+```Registry``` is the internal registry of skill classes. If you simply construct onewith the no-args constructor, it should be fine, and this constructor is annotated with
 ```@Inject``` . 
 
 ```TypeFactory``` is the Skillz-specific abstraction used for constructing new 
@@ -199,7 +213,7 @@ Let's take a look at a simple class:
  7. Profit!
  
 Intent Lifecycle
-================
+----------------
 
 At this point in the process, you have surely looked at the Amazon documentation and
 understand your intent can be invoked in several ways. You can use the following 
@@ -220,4 +234,4 @@ of the current session values. ```@ExpressionValue("session.attributes.selectedI
 will give you the "selectedItemId" key from the map. 
 ```@ExpressionValue("session.user.userId")``` returns the unique user id.
 
-See also [https://en.wikipedia.org/wiki/OGNL]
+See also [https://en.wikipedia.org/wiki/OGNL](https://en.wikipedia.org/wiki/OGNL)

@@ -17,7 +17,7 @@ allprojects {
     repositories {
         mavenCentral()
         jcenter()
-        //mavenLocal()
+        mavenLocal()
         maven {
             url  "http://dl.bintray.com/kebernet/maven"
         }

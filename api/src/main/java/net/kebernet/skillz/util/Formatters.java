@@ -23,9 +23,11 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 /**
- * Created by rcooper on 10/16/16.
+ * Utility class with some general purpose Formatters.
  */
 public abstract class Formatters {
+
+    private Formatters(){}
 
     @Singleton
     public static class SimplePlainTextTell implements Formatter<String> {

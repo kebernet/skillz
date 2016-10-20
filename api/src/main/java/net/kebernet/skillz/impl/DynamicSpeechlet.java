@@ -32,8 +32,8 @@ import net.kebernet.invoker.runtime.impl.InvokableMethod;
 import net.kebernet.skillz.FormatterMappings;
 import net.kebernet.skillz.SkillzException;
 import net.kebernet.skillz.TypeFactory;
-import net.kebernet.skillz.annotation.Launched;
 import net.kebernet.skillz.annotation.ExpressionValue;
+import net.kebernet.skillz.annotation.Launched;
 import net.kebernet.skillz.annotation.ResponseFormatter;
 import net.kebernet.skillz.annotation.SessionEnded;
 import net.kebernet.skillz.annotation.SessionStarted;
@@ -43,6 +43,7 @@ import net.kebernet.skillz.util.Coercion;
 import ognl.Ognl;
 import ognl.OgnlException;
 
+import javax.annotation.Nullable;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,6 +52,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This is a Speechlet subclass that will delegate to a Skill annotated pojo.
@@ -74,6 +76,7 @@ public class DynamicSpeechlet implements Speechlet {
         this.typeFactory = typeFactory;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public IntrospectionData getData() {
         return data;
     }
@@ -102,8 +105,8 @@ public class DynamicSpeechlet implements Speechlet {
     private <T extends SpeechletRequest> SpeechletResponse handleResponseEvent(String name, T request, Session session) throws SpeechletException {
         List<InvokableMethod> started = methods.get(name);
         if (started == null || started.isEmpty()) {
-            LOGGER.log(Level.SEVERE, "No handler available for " + name + " on path " + ((Skill) data.getType().getAnnotation(Skill.class)).path());
-            throw new SpeechletException("No hanlder available for " + name);
+            LOGGER.log(Level.SEVERE, "No handler available for '" + name + "' on path " + ((Skill) data.getType().getAnnotation(Skill.class)).path());
+            throw new SpeechletException("No handler available for '" + name+"'");
         }
         if (started.size() == 1) {
             InvokableMethod method = started.iterator().next();
@@ -119,7 +122,7 @@ public class DynamicSpeechlet implements Speechlet {
     private SpeechletResponse invokeResponseEvent(InvokableMethod method, List<ParameterValue> values) {
         try {
             ResponseFormatter declaredFormatter = method.getNativeMethod().getAnnotation(ResponseFormatter.class);
-            Object result = registry.getInvoker().invoke(implementation, method.getName(), values);
+            Object result = registry.getInvoker().invoke(implementation, method, values);
             if (result instanceof SpeechletResponse) {
                 return (SpeechletResponse) result;
             } else if(declaredFormatter != null) {
@@ -128,22 +131,23 @@ public class DynamicSpeechlet implements Speechlet {
                 return (SpeechletResponse) responseMapper.findMappingFunction(result.getClass()).apply(result);
             }
         } catch (InvokerException e) {
-            throw new SkillzException("Unable to sevaluate method : " + method, e);
+            LOGGER.log(Level.WARNING, "Exception invoking method: "+method.getNativeMethod().getName()+" ("+method.getName()+")", e);
+            throw new SkillzException("Unable to evaluate method : " + method, e);
         }
     }
 
 
     private <T extends SpeechletRequest> void handleVoidEvent(Class<? extends Annotation> annotation, T request, Session session) {
-        List<InvokableMethod> started = methods.get(annotation.getSimpleName());
-        if (started == null || started.isEmpty()) {
+        List<InvokableMethod> handlers = methods.get(annotation.getSimpleName());
+        if (handlers == null || handlers.isEmpty()) {
             return;
         }
-        if (started.size() == 1) {
-            InvokableMethod method = started.iterator().next();
+        if (handlers.size() == 1) {
+            InvokableMethod method = handlers.iterator().next();
             List<ParameterValue> values = synthesizeValues(data, method, request, session);
             invokeVoidEvent(method, values);
         } else {
-            MethodEvaluation evaluation = findMethodEvaluation(request, session, started);
+            MethodEvaluation evaluation = findMethodEvaluation(request, session, handlers);
             invokeVoidEvent(evaluation.method, evaluation.values);
         }
     }
@@ -159,44 +163,51 @@ public class DynamicSpeechlet implements Speechlet {
         }
     }
 
-    private MethodEvaluation findMethodEvaluation(SpeechletRequest request, Session session, List<InvokableMethod> started) {
-        return started.stream()
+    private MethodEvaluation findMethodEvaluation(SpeechletRequest request, Session session, List<InvokableMethod> methods) {
+        return methods.stream()
                 .map(m -> {
                     List<ParameterValue> possibleArguments = synthesizeValues(data, m, request, session);
-                    return new MethodEvaluation(m, possibleArguments, m.matchValue(m.getName(), possibleArguments));
+                    int score = m.matchValue(m.getName(), possibleArguments);
+                    return new MethodEvaluation(m, possibleArguments, score);
                 })
+                .filter(m->
+                        m.score >= 0)
                 .sorted()
                 .findFirst()
-                .orElseThrow(() -> new SkillzException("Unable to deal with methods: " + started));
+                .orElseThrow(() -> new SkillzException("Unable to deal with methods: " + methods));
     }
 
+    @SuppressWarnings("WeakerAccess")
     static <T extends SpeechletRequest> List<ParameterValue> synthesizeValues(IntrospectionData data, InvokableMethod method,
                                                                               T request, Session session) {
         Map<String, Object> context = new HashMap<>(2);
         context.put("session", session);
         context.put("request", request);
-        ArrayList<ParameterValue> values = method.getParameters()
-                .stream()
-                .map(param -> {
-                    Slot slotAnnotation = param.getParameter().getAnnotation(Slot.class);
-                    if (slotAnnotation != null) {
-                        try {
-                            IntentRequest ir = (IntentRequest) request;
-                            com.amazon.speech.slu.Slot slot = ir.getIntent().getSlot(slotAnnotation.name());
-                            return slot == null ? null : new ParameterValue(param.getName(), coersion.coerce(slot.getValue(), param.getType()));
-                        } catch (ClassCastException e) {
-                            throw new SkillzException(data.getType().getCanonicalName() + "." + method.getNativeMethod().getName() + " cannot declare a slot unless " +
-                                    "it is handling and IntentRequest.");
-                        }
-                    }
-                    ExpressionValue requestValue = param.getParameter().getAnnotation(ExpressionValue.class);
-                    if (requestValue != null) {
-                        return new ParameterValue(param.getName(), evaluate(context, requestValue.value()));
-                    }
-                    return null;
-                })
-                .collect(Collectors.toCollection(ArrayList::new));
-        return values;
+        final ArrayList<ParameterValue> parameterValues = new ArrayList<>();
+        method.getParameters()
+        .stream()
+        .flatMap(param -> {
+            Slot slotAnnotation = param.getParameter().getAnnotation(Slot.class);
+            if (slotAnnotation != null) {
+                try {
+                    IntentRequest ir = (IntentRequest) request;
+                    com.amazon.speech.slu.Slot slot = ir.getIntent().getSlot(slotAnnotation.name());
+                    return slot == null ? Stream.empty() :
+                            Stream.of(new ParameterValue(param.getName(), coersion.coerce(slot.getValue(), param.getType())));
+                } catch (ClassCastException e) {
+                    throw new SkillzException(data.getType().getCanonicalName() + "." + method.getNativeMethod().getName() + " cannot declare a slot unless " +
+                            "it is handling and IntentRequest.");
+                }
+            }
+            ExpressionValue requestValue = param.getParameter().getAnnotation(ExpressionValue.class);
+            if (requestValue != null) {
+                Object value = evaluate(context, requestValue.value());
+                return Stream.of(new ParameterValue(param.getName(), coersion.coerce(value, param.getType())));
+            }
+            return Stream.empty();
+        })
+        .forEach(parameterValues::add);
+        return parameterValues;
     }
 
     private static Object evaluate(Map<String, Object> context, String expression) {
@@ -229,10 +240,25 @@ public class DynamicSpeechlet implements Speechlet {
             this.score = score;
         }
 
-        public int compareTo(Object o) {
+        public int compareTo(@Nullable Object o) {
+            if(o == null){
+                return -1;
+            }
             MethodEvaluation that = (MethodEvaluation) o;
             if (this.score == 0 && that.score == 0) {
-                return Integer.compare(that.method.getRequiredParameterCount(), this.method.getRequiredParameterCount());
+                int values = Integer.compare(that.values.size(), this.values.size());
+                if(values == 0){
+                    int delta =  Integer.compare(
+                            Math.abs(this.method.getParameters().size() - this.values.size()),
+                            Math.abs(that.method.getParameters().size() - that.values.size()));
+                    if(delta == 0) {
+                        return Integer.compare(this.method.getParameters().size(), that.method.getParameters().size());
+                    } else {
+                        return delta;
+                    }
+                } else {
+                    return values;
+                }
             } else {
                 return Integer.compare(that.score, this.score);
             }
@@ -245,9 +271,13 @@ public class DynamicSpeechlet implements Speechlet {
 
             MethodEvaluation that = (MethodEvaluation) o;
 
-            if (score != that.score) return false;
-            if (method != null ? !method.equals(that.method) : that.method != null) return false;
-            return values != null ? values.equals(that.values) : that.values == null;
+            return score == that.score && (
+                    method != null ?
+                            method.equals(that.method) :
+                            that.method == null &&
+                            (values != null ?
+                                    values.equals(that.values) :
+                                    that.values == null));
         }
 
         @Override

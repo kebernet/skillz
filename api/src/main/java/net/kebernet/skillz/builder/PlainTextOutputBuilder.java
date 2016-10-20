@@ -23,9 +23,9 @@ import com.amazon.speech.ui.PlainTextOutputSpeech;
  *     Example:
  * </p>
  * <pre>
- *     PlainTextSpeedOutput output = PlainTextSpeechOutputBuilder.withText("Hello, world.")
- *                                                               .withId("id:hello")
- *                                                               .build();
+ *     PlainTextSpeedOutput output = PlainTextOutputBuilder.withText("Hello, world.")
+ *                                                          .withId("id:hello")
+ *                                                          .build();
 *  </pre>
  *
  */
@@ -37,11 +37,20 @@ public class PlainTextOutputBuilder {
         this.result.setText(text);
     }
 
+    /**
+     * Sets the ID for the PlainTextSpeechOutput
+     * @param id The id
+     * @return The builder
+     */
     public PlainTextOutputBuilder withId(String id){
         this.result.setId(id);
         return this;
     }
 
+    /**
+     * Constructs a PlainTextSpeechOutput from the current values.
+     * @return SpeechOutput.
+     */
     public PlainTextOutputSpeech build(){
         if(this.result.getId() == null){
             this.result.setId(Integer.toString(result.getText().hashCode()) );
@@ -49,6 +58,11 @@ public class PlainTextOutputBuilder {
         return this.result;
     }
 
+    /** Begin a new Builder with the plain text value
+     *
+     * @param text Text to use
+     * @return the builder
+     */
     public static PlainTextOutputBuilder withText(String text){
         return new PlainTextOutputBuilder(text);
     }

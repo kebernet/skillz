@@ -18,8 +18,18 @@ package net.kebernet.skillz.builder;
 import com.amazon.speech.ui.SsmlOutputSpeech;
 
 /**
- * Created by rcooper on 10/18/16.
+ * A builder for PlainTextOutputSpeech.
+ * <p>
+ *     Example:
+ * </p>
+ * <pre>
+ *     SsmlOutputBuilder output = SsmlOutputBuilder.withText("Hello, world.")
+ *                                                 .withId("id:hello")
+ *                                                 .build();
+ * </pre>
+ *
  */
+@SuppressWarnings("WeakerAccess")
 public class SsmlOutputBuilder {
 
     private final SsmlOutputSpeech result = new SsmlOutputSpeech();

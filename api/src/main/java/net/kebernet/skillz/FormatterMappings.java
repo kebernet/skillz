@@ -35,6 +35,7 @@ public class FormatterMappings {
      * @param type A class reference for the return type to format.
      * @param provider A Provider that returns an instance of the Formatter for the type.
      */
+    @SuppressWarnings("WeakerAccess")
     public void addMappingFunctionProvider(Class<?> type, Provider<Formatter<?>> provider){
         if(this.mappers.put(type, provider) != null){
             throw new SkillzException("You have attempted to register two formatters for the type "+
@@ -47,6 +48,7 @@ public class FormatterMappings {
      * @param type Class reference of the type to format.
      * @param formatter The formatter for the given type.
      */
+    @SuppressWarnings("WeakerAccess")
     public void addMappingFunction(Class<?> type, Formatter<?> formatter){
         if(this.mappers.put(type, ()->formatter) != null){
             throw new SkillzException("You have attempted to register two formatters for the type "+
