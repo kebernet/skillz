@@ -11,7 +11,7 @@ dependencies {
     compile 'org.reflections:reflections:0.9.+'
     compile 'ognl:ognl:3.0.4'
     compile 'com.amazon.alexa:alexa-skills-kit:+'
-    compile 'javax.servlet:servlet-api:2.5'
+    compileOnly 'javax.servlet:servlet-api:2.5'
     compileOnly 'javax.inject:javax.inject:1'
 
     testCompile 'javax.inject:javax.inject:1'

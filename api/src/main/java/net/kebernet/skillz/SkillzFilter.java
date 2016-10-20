@@ -38,6 +38,8 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.logging.Logger;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  *  This is the servlet Filter that handles dispatching requests to the declared
  *  Skill classes.
@@ -52,6 +54,7 @@ public class SkillzFilter implements Filter {
     private final TypeFactory factory;
     private final Registry registry;
     private final FormatterMappings mappings;
+    private String pathPrefix = "/";
 
 
     /**
@@ -95,7 +98,14 @@ public class SkillzFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
+        if(filterConfig.getInitParameter("pathPrefix") != null) {
+            this.pathPrefix = filterConfig.getInitParameter("pathPrefix");
+        }
+    }
 
+    public void setPathPrefix(String pathPrefix){
+        checkNotNull(pathPrefix);
+        this.pathPrefix = pathPrefix;
     }
 
     @Override
@@ -103,7 +113,10 @@ public class SkillzFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
 
-        String path = request.getPathInfo();
+        String path = request.getRequestURI();
+        if(path.startsWith(pathPrefix)){
+            path = path.substring(pathPrefix.length(), path.length());
+        }
         LOGGER.finer("Checking for Skill at "+path);
         if(!Strings.isNullOrEmpty(path)){
             Optional<IntrospectionData> handler = registry.getDataForPath(path);

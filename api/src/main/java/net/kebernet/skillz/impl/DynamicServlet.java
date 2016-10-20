@@ -47,6 +47,7 @@ public class DynamicServlet extends SpeechletServlet {
                 resp.setContentType(TEXT_PLAIN);
                 resp.setCharacterEncoding(UTF_8);
                 output.writeTo(resp.getWriter());
+                resp.flushBuffer();
                 break;
             }
             case INTENTS: {

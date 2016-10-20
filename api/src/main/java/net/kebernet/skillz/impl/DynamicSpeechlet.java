@@ -117,6 +117,11 @@ public class DynamicSpeechlet implements Speechlet {
         }
     }
 
+    /**
+     * Invokes a method and creates a speechlet response.
+     * @param method The method to invoke
+     * @param values The parameter values to use.
+     */
     @SuppressWarnings("unchecked")
     private SpeechletResponse invokeResponseEvent(InvokableMethod method, List<ParameterValue> values) {
         try {
@@ -176,12 +181,23 @@ public class DynamicSpeechlet implements Speechlet {
                 .orElseThrow(() -> new SkillzException("Unable to deal with methods: " + methods));
     }
 
+    /**
+     * This method creates a synthesized list of ParameterValues to use as possible invocation arguments
+     * @param data Introspection data to use.
+     * @param method The method we might want to invoke
+     * @param request The SpeechletRequest to use.
+     * @param session The session to use.
+     * @param <T> The type of speechlet request.
+     * @return A List of parameter values evaluated from the request and session context.
+     */
     @SuppressWarnings("WeakerAccess")
     static <T extends SpeechletRequest> List<ParameterValue> synthesizeValues(IntrospectionData data, InvokableMethod method,
                                                                               T request, Session session) {
+        // Create the ExpressionValue context.
         Map<String, Object> context = new HashMap<>(2);
         context.put("session", session);
         context.put("request", request);
+
         final ArrayList<ParameterValue> parameterValues = new ArrayList<>();
         method.getParameters()
         .stream()
@@ -225,8 +241,6 @@ public class DynamicSpeechlet implements Speechlet {
 
         return value;
     }
-
-
 
     private static class MethodEvaluation implements Comparable {
         final InvokableMethod method;

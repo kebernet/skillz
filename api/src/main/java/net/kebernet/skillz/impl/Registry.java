@@ -64,6 +64,7 @@ public class Registry {
      */
     @Inject
     public Registry(){
+        ReflectFilter.registerUrlTypes();
         LOGGER.fine("Beginning scan for skills.");
         Reflections reflections = new Reflections(Thread.currentThread().getContextClassLoader());
         Set<Class<?>> types = reflections.getTypesAnnotatedWith(Skill.class);
@@ -79,6 +80,9 @@ public class Registry {
         LOGGER.fine("Skill introspection complete. Found "+types.size()+" skills.");
         types.forEach((c)-> {
             String path = c.getAnnotation(Skill.class).path();
+            if(!path.startsWith("/")){
+                path = "/"+path;
+            }
             Class<?> previous = pathsToClasses.put(path, c);
             if(previous != null){
                 // TODO, allow multiple implemetnations to handle different intents.
