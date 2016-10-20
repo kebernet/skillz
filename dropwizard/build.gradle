@@ -4,7 +4,7 @@ apply plugin: 'nebula.maven-publish'
 apply plugin: 'findbugs'
 apply plugin: "jacoco"
 
-sourceCompatibility = 1.8
+description = "Dropwizard Bundle for Skillz"
 
 configurations.all {
     // To prevent slf4j complaining about multiple logging implementations (and failing), trick gradle into providing only a single
