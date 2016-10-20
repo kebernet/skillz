@@ -26,7 +26,7 @@ test!
 Rather than implementing a Speechlet and configuring a servlet to handle it, you can simple annotate a class
 and have the invocation of your methods handled by the Skillz framework. For example:
 
-```
+```java
 @Skill(path="/burnsallen")      // <- this is the path your skill will live at.
 public class BurnsAndAllen {
 

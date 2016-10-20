@@ -1,4 +1,4 @@
 #!/bin/sh
-./gradlew test
+./gradlew licenseFormat test
 RESULT=$?
 exit $RESULT

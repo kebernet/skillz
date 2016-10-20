@@ -27,10 +27,16 @@ the ASK works and what the components of a skill are.
 The simplest way to get started is to simply add the ```Skillz Filter``` class to 
 your ```web.xml``` file.
 
-```
+```xml
     <filter>
        <filter-name>SkillzFilter</filter-name>
        <filter-class>net.kebernet.skillz.SkillzFilter</filter-class>
+       <init-param>
+          <param-name>prefixPath</param-name>
+          <!-- this needs to match your url pattern, but is optional in
+               the case of /* -->
+          <param-value>/</param-value>
+       </init-param>
     </filter>
     
     <filter-mapping>
@@ -63,7 +69,7 @@ It requires:
 instances of classes. You will want to provide an implementation of this appropriate
 to your system. This might typically look like, for a Guice module:
 
-```
+```java
     @Provides
     @Singleton
     TypeFactory createTypeFactory(final Injector injector){
@@ -98,7 +104,7 @@ to the Alexa Skills Kit.
 
 Let's take a look at a simple class:
 
-```
+```java
     public class SearchForThings {
         public List<String> search(String query) {
             //... do the search
@@ -111,7 +117,7 @@ Let's take a look at a simple class:
      The first step is to put a skill annotation and declare a path for your
      skill:
      
-     ```
+     ```java
      @Skill(path="/searchMyStuffSkill")
      public class SearchForThings {
      ```
@@ -122,7 +128,7 @@ Let's take a look at a simple class:
      refer to the Amazon documentation for that. Needless to say, we want our method
      to be exposed as an Intent for Alexa to invoke:
      
-     ```
+     ```java
         @Intent("Search")
         public List<String> search(String query)
      ```
@@ -130,7 +136,7 @@ Let's take a look at a simple class:
  3.  Annotate your parameters with where they should come from in the ASK request.
      here we are going to use a Slot called "query".
      
-     ```
+     ```java
          @Intent("Search")
          public List<String> search(@Slot(name="query", type="AmazonSlotTypes.LITERAL") String query)
      ```
@@ -142,7 +148,7 @@ Let's take a look at a simple class:
  4.  Annotate your method with "Utterances" that Amazon will use as templates for user
      input.
      
-     ```
+     ```java
          @Intent("Search")
          @Utterances({
             "search for {query|aurora coffee}",
@@ -158,7 +164,7 @@ Let's take a look at a simple class:
       but we need to turn that into a SpeechletResponse. The first step is to put
       a ```@ResponseFormatter``` annotation on our method:
       
-      ```
+      ```java
          @Intent("Search")
          @Utterances({
             "search for {query|aurora coffee}",
@@ -173,7 +179,7 @@ Let's take a look at a simple class:
       our list of Strings our search method was already returning into an English 
       expression that Alexa will speak back to the user.
       
-      ```
+      ```java
         public class SearchFormatter implements Formatter<List<String>> {
         
             public SpeechletResponse apply(List<String> value){
