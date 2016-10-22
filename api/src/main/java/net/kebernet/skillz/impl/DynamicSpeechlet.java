@@ -110,10 +110,10 @@ public class DynamicSpeechlet implements Speechlet {
         if (started.size() == 1) {
             InvokableMethod method = started.iterator().next();
             List<ParameterValue> values = synthesizeValues(data, method, request, session);
-            return invokeResponseEvent(method, values);
+            return invokeResponseEvent(method, values, request, session);
         } else {
             MethodEvaluation evaluation = findMethodEvaluation(request, session, started);
-            return invokeResponseEvent(evaluation.method, evaluation.values);
+            return invokeResponseEvent(evaluation.method, evaluation.values, request, session);
         }
     }
 
@@ -123,16 +123,16 @@ public class DynamicSpeechlet implements Speechlet {
      * @param values The parameter values to use.
      */
     @SuppressWarnings("unchecked")
-    private SpeechletResponse invokeResponseEvent(InvokableMethod method, List<ParameterValue> values) {
+    private SpeechletResponse invokeResponseEvent(InvokableMethod method, List<ParameterValue> values, SpeechletRequest request, Session session) {
         try {
             ResponseFormatter declaredFormatter = method.getNativeMethod().getAnnotation(ResponseFormatter.class);
             Object result = registry.getInvoker().invoke(implementation, method, values);
             if (result instanceof SpeechletResponse) {
                 return (SpeechletResponse) result;
             } else if(declaredFormatter != null) {
-                return (SpeechletResponse) typeFactory.create(declaredFormatter.value()).apply(result);
+                return typeFactory.create(declaredFormatter.value()).apply(result, request, session);
             } else {
-                return (SpeechletResponse) responseMapper.findMappingFunction(result.getClass()).apply(result);
+                return responseMapper.findMappingFunction(result.getClass()).apply(result, request, session);
             }
         } catch (InvokerException e) {
             LOGGER.log(Level.WARNING, "Exception invoking method: "+method.getNativeMethod().getName()+" ("+method.getName()+")", e);

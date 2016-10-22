@@ -15,9 +15,9 @@
  */
 package net.kebernet.skillz;
 
+import com.amazon.speech.speechlet.Session;
+import com.amazon.speech.speechlet.SpeechletRequest;
 import com.amazon.speech.speechlet.SpeechletResponse;
-
-import java.util.function.Function;
 
 /**
  * A subtype of Function for converting a return value from a method into the appropriate
@@ -26,6 +26,6 @@ import java.util.function.Function;
  * @see net.kebernet.skillz.FormatterMappings
  *
  */
-public interface Formatter<T> extends Function<T, SpeechletResponse> {
-
+public interface Formatter<T> {
+    SpeechletResponse apply(T t, SpeechletRequest request, Session session);
 }

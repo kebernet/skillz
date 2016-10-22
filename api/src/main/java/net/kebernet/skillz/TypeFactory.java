@@ -27,7 +27,6 @@ import javax.inject.Singleton;
  * </p>
  *
  */
-@Singleton
 public interface TypeFactory {
     /**
      * Creates an instance of type T.

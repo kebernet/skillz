@@ -1,9 +1,8 @@
 Format
 ======
 
-This project contains utilities for creating Formatters for Skillz.
+This project contains utilities for creating Formatters for Skillz. It allows you to package 
+templates for formatting your text or SSML responses with Mustache.
 
-This project is built around Apache Velocity, and it is broken out as
-as separate library just in case you don't want to drag all those 
-dependencies into you project. :)
+
 

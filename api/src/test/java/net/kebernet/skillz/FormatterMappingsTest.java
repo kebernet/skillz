@@ -30,32 +30,32 @@ public class FormatterMappingsTest {
     public void addMappingFunctionProvider() throws Exception {
         FormatterMappings mappings = new FormatterMappings();
         mappings.addMappingFunctionProvider(String.class, ()->{
-            Formatter f = (String)-> SpeechletResponse.newTellResponse(
+            Formatter f = (String, SpeechletRequest, Session)-> SpeechletResponse.newTellResponse(
                 PlainTextOutputBuilder.withText("foo").build()
             );
             return f;
         } );
-        SpeechletResponse response = (SpeechletResponse) mappings.findMappingFunction(String.class).apply("bar");
+        SpeechletResponse response = (SpeechletResponse) mappings.findMappingFunction(String.class).apply("bar", null, null);
         assertEquals("foo", ((PlainTextOutputSpeech) response.getOutputSpeech()).getText());
     }
 
     @Test
     public void addMappingFunction() throws Exception {
         FormatterMappings mappings = new FormatterMappings();
-        mappings.addMappingFunction(String.class,  (String)-> SpeechletResponse.newTellResponse(
+        mappings.addMappingFunction(String.class,  (String, SpeechletRequest, Session)-> SpeechletResponse.newTellResponse(
                 PlainTextOutputBuilder.withText("foo").build()
         ));
-        SpeechletResponse response = (SpeechletResponse) mappings.findMappingFunction(String.class).apply("bar");
+        SpeechletResponse response = mappings.findMappingFunction(String.class).apply("bar", null, null);
         assertEquals("foo", ((PlainTextOutputSpeech) response.getOutputSpeech()).getText());
     }
 
     @Test(expected = SkillzException.class)
     public void addMappingFunctionMiss() throws Exception {
         FormatterMappings mappings = new FormatterMappings();
-        mappings.addMappingFunction(Integer.class,  (String)-> SpeechletResponse.newTellResponse(
+        mappings.addMappingFunction(Integer.class,  (String, SpeechletRequest, Session)-> SpeechletResponse.newTellResponse(
                 PlainTextOutputBuilder.withText("foo").build()
         ));
-        mappings.findMappingFunction(String.class).apply("bar");
+        mappings.findMappingFunction(String.class).apply("bar", null, null);
 
     }
 
@@ -63,11 +63,11 @@ public class FormatterMappingsTest {
     public void addMappingFunctionProviderMiss() throws Exception {
         FormatterMappings mappings = new FormatterMappings();
         mappings.addMappingFunctionProvider(Integer.class, ()->{
-            Formatter f = (String)-> SpeechletResponse.newTellResponse(
+            Formatter f = (String, SpeechletRequest, Session)-> SpeechletResponse.newTellResponse(
                     PlainTextOutputBuilder.withText("foo").build()
             );
             return f;
         } );
-        mappings.findMappingFunction(String.class).apply("bar");
+        mappings.findMappingFunction(String.class).apply("bar", null, null);
     }
 }

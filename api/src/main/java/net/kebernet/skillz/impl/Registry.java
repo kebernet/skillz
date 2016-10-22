@@ -15,6 +15,8 @@
  */
 package net.kebernet.skillz.impl;
 
+import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
+import io.github.lukehutch.fastclasspathscanner.matchprocessor.ClassAnnotationMatchProcessor;
 import net.kebernet.invoker.runtime.Invoker;
 import net.kebernet.invoker.runtime.impl.IntrospectionData;
 import net.kebernet.skillz.SkillzException;
@@ -25,7 +27,6 @@ import net.kebernet.skillz.annotation.SessionEnded;
 import net.kebernet.skillz.annotation.SessionStarted;
 import net.kebernet.skillz.annotation.Skill;
 import net.kebernet.skillz.annotation.Slot;
-import org.reflections.Reflections;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -34,6 +35,7 @@ import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -64,10 +66,10 @@ public class Registry {
      */
     @Inject
     public Registry(){
-        ReflectFilter.registerUrlTypes();
         LOGGER.fine("Beginning scan for skills.");
-        Reflections reflections = new Reflections(Thread.currentThread().getContextClassLoader());
-        Set<Class<?>> types = reflections.getTypesAnnotatedWith(Skill.class);
+        HashSet<Class<?>> types = new HashSet<>();
+        new FastClasspathScanner().matchClassesWithAnnotation(Skill.class, types::add)
+                .scan();
         this.invoker = new Invoker(Registry::createMethodName, Registry::createParameterName);
         this.pathsToClasses = new HashMap<>(types.size());
         LOGGER.fine("Scan for skills complete.");
@@ -75,9 +77,12 @@ public class Registry {
     }
 
     private void init(Set<Class<?>> types) {
+        StringBuilder sb = new StringBuilder();
+        types.forEach(t->sb.append(t.getCanonicalName()).append(' '));
+        LOGGER.info("Introspecting: "+sb.toString());
         types.forEach(this.invoker::registerType);
         types.forEach(this::validateType);
-        LOGGER.fine("Skill introspection complete. Found "+types.size()+" skills.");
+        LOGGER.info("Skill introspection complete. Found "+types.size()+" skills.");
         types.forEach((c)-> {
             String path = c.getAnnotation(Skill.class).path();
             if(!path.startsWith("/")){

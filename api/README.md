@@ -138,7 +138,7 @@ Let's take a look at a simple class:
      
      ```java
          @Intent("Search")
-         public List<String> search(@Slot(name="query", type="AmazonSlotTypes.LITERAL") String query)
+         public List<String> search(@Slot(name="query", type=AmazonSlotTypes.LITERAL) String query)
      ```
      
      Again, we are not going to get into the various slot types. Please refer to the
@@ -155,7 +155,7 @@ Let's take a look at a simple class:
             "find {query|aurora coffee}",
             "give me {query|aurora coffee}"
          })
-         public List<String> search(@Slot(name="query", type="AmazonSlotTypes.LITERAL") String query)
+         public List<String> search(@Slot(name="query", type=AmazonSlotTypes.LITERAL) String query)
       ```
       
       These are the lines you will use to populate the Amazon web site later.
@@ -172,7 +172,7 @@ Let's take a look at a simple class:
             "give me {query|aurora coffee}"
          })
          @ResponseFormatter(SearchFormatter.class)
-         public List<String> search(@Slot(name="query", type="AmazonSlotTypes.LITERAL") String query)
+         public List<String> search(@Slot(name="query", type=AmazonSlotTypes.LITERAL) String query)
       ```
       
       And once we have done that, we need to implement the formatter. This will turn
@@ -182,7 +182,7 @@ Let's take a look at a simple class:
       ```java
         public class SearchFormatter implements Formatter<List<String>> {
         
-            public SpeechletResponse apply(List<String> value){
+            public SpeechletResponse apply(List<String> value, SpeechletRequet request, Session session){
             
                 final StringBuilder response = new StringBuilder("I found ")
                     .append(value.size())

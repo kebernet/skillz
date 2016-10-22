@@ -15,6 +15,8 @@
  */
 package net.kebernet.skillz.util;
 
+import com.amazon.speech.speechlet.Session;
+import com.amazon.speech.speechlet.SpeechletRequest;
 import com.amazon.speech.speechlet.SpeechletResponse;
 import net.kebernet.skillz.Formatter;
 import net.kebernet.skillz.builder.PlainTextOutputBuilder;
@@ -35,7 +37,7 @@ public abstract class Formatters {
         public SimplePlainTextTell(){}
 
         @Override
-        public SpeechletResponse apply(String s) {
+        public SpeechletResponse apply(String s, SpeechletRequest request, Session session) {
             return SpeechletResponse.newTellResponse(PlainTextOutputBuilder.withText(s).build());
         }
     }

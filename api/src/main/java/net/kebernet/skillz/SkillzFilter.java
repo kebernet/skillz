@@ -26,6 +26,7 @@ import net.kebernet.skillz.impl.Registry;
 import net.kebernet.skillz.util.Pool;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -45,6 +46,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *  Skill classes.
  *
  */
+@Singleton
 public class SkillzFilter implements Filter {
     private static final Logger LOGGER = Logger.getLogger(SkillzFilter.class.getCanonicalName());
     /** We are pooling servlet instances so that we don't run into threading issues replacing the
@@ -117,7 +119,10 @@ public class SkillzFilter implements Filter {
         if(path.startsWith(pathPrefix)){
             path = path.substring(pathPrefix.length(), path.length());
         }
-        LOGGER.finer("Checking for Skill at "+path);
+        if(!path.startsWith("/")){
+            path = "/"+path;
+        }
+        LOGGER.finer("Checking for Skill at "+path +" (prefix: "+pathPrefix+" requestURI: "+request.getRequestURI());
         if(!Strings.isNullOrEmpty(path)){
             Optional<IntrospectionData> handler = registry.getDataForPath(path);
             if(!handler.isPresent()){ // Nothing to handle.
@@ -126,7 +131,7 @@ public class SkillzFilter implements Filter {
             }
 
             IntrospectionData data = handler.get();
-            LOGGER.fine("Handling skill request for "+path+" with "+data.getType());
+            LOGGER.finer("Handling skill request for "+path+" with "+data.getType());
             Object instance = factory.create(data.getType());
             final ArrayListMultimap<String, InvokableMethod> methods = ArrayListMultimap.create();
             data.getMethods().forEach(m->methods.put(m.getName(), m));
