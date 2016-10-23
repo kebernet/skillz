@@ -49,19 +49,7 @@ public class Coercion {
     private static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
     { // Instance init
-        Key key = new Key(String.class, String.class);
-        coercions.put(key, new Converter<String, String>() {
-
-            @Override
-            public String convert(String source) {
-                if (source == null || source.trim().isEmpty()) {
-                    return null;
-                } else {
-                    return source;
-                }
-            }
-        });
-        key = new Key(String.class, Integer.class);
+        Key key = new Key(String.class, Integer.class);
         coercions.put(key, new Converter<String, Integer>() {
 
             @Override
@@ -273,8 +261,8 @@ public class Coercion {
         Converter<S, D> convert = null;
         boolean hasConverter = source != null && (convert = coercions.get(new Key(sourceClass, destination))) != null;
 
-        if(source == null){
-            return null;
+        if(source == null || destination.isAssignableFrom(sourceClass)){
+            return (D) source;
         } else if(!hasConverter && sourceClass.isAssignableFrom(destination)) {
             value = (D) source;
         }else if(destination.isEnum()) {
@@ -292,6 +280,7 @@ public class Coercion {
             if(String.class.equals(destination) && convert == null){
                 return (D) source.toString();
             }
+            if(sourceClass.isAssignableFrom(destination))
             checkNotNull(convert, "Could not find a converter to go from "+sourceClass+" to "+destination);
             return convert.convert(source);
         }

@@ -43,6 +43,7 @@ import net.kebernet.skillz.util.Coercion;
 import ognl.Ognl;
 import ognl.OgnlException;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
@@ -102,18 +103,26 @@ public class DynamicSpeechlet implements Speechlet {
     }
 
     private <T extends SpeechletRequest> SpeechletResponse handleResponseEvent(String name, T request, Session session) throws SpeechletException {
-        List<InvokableMethod> started = methods.get(name);
-        if (started == null || started.isEmpty()) {
-            LOGGER.log(Level.SEVERE, "No handler available for '" + name + "' on path " + ((Skill) data.getType().getAnnotation(Skill.class)).path());
-            throw new SpeechletException("No handler available for '" + name+"'");
-        }
-        if (started.size() == 1) {
-            InvokableMethod method = started.iterator().next();
-            List<ParameterValue> values = synthesizeValues(data, method, request, session);
-            return invokeResponseEvent(method, values, request, session);
-        } else {
-            MethodEvaluation evaluation = findMethodEvaluation(request, session, started);
-            return invokeResponseEvent(evaluation.method, evaluation.values, request, session);
+        try {
+            LOGGER.fine("Doing response event " + name);
+            List<InvokableMethod> matches = methods.get(name);
+            if (matches == null || matches.isEmpty()) {
+                LOGGER.log(Level.SEVERE, "No handler available for '" + name + "' on path " + ((Skill) data.getType().getAnnotation(Skill.class)).path());
+                throw new SpeechletException("No handler available for '" + name + "'");
+            }
+            if (matches.size() == 1) {
+                InvokableMethod method = matches.iterator().next();
+                LOGGER.fine("Found single match method " + method.getNativeMethod().toGenericString());
+                List<ParameterValue> values = synthesizeValues(data, method, request, session);
+                return invokeResponseEvent(method, values, request, session);
+            } else {
+                MethodEvaluation evaluation = findMethodEvaluation(request, session, matches);
+                LOGGER.fine("Decided to call " + evaluation.method.getNativeMethod().toGenericString());
+                return invokeResponseEvent(evaluation.method, evaluation.values, request, session);
+            }
+        } catch(RuntimeException e){
+            LOGGER.log(Level.SEVERE, "Exception handling response event ", e);
+            throw e;
         }
     }
 
@@ -123,19 +132,23 @@ public class DynamicSpeechlet implements Speechlet {
      * @param values The parameter values to use.
      */
     @SuppressWarnings("unchecked")
-    private SpeechletResponse invokeResponseEvent(InvokableMethod method, List<ParameterValue> values, SpeechletRequest request, Session session) {
+    private SpeechletResponse invokeResponseEvent(@Nonnull InvokableMethod method, @Nonnull List<ParameterValue> values, SpeechletRequest request, Session session) {
         try {
             ResponseFormatter declaredFormatter = method.getNativeMethod().getAnnotation(ResponseFormatter.class);
             Object result = registry.getInvoker().invoke(implementation, method, values);
-            if (result instanceof SpeechletResponse) {
+            LOGGER.info("Response object "+result);
+            if (result != null && result instanceof SpeechletResponse) {
+                LOGGER.info("That was a speechlet response.");
                 return (SpeechletResponse) result;
             } else if(declaredFormatter != null) {
+                LOGGER.info("Using declared formatter... "+declaredFormatter.value().getCanonicalName());
                 return typeFactory.create(declaredFormatter.value()).apply(result, request, session);
             } else {
+                LOGGER.info("Looking for a mapping function for "+result.getClass());
                 return responseMapper.findMappingFunction(result.getClass()).apply(result, request, session);
             }
         } catch (InvokerException e) {
-            LOGGER.log(Level.WARNING, "Exception invoking method: "+method.getNativeMethod().getName()+" ("+method.getName()+")", e);
+            LOGGER.log(Level.SEVERE, "Exception invoking method: "+method.getNativeMethod().getName()+" ("+method.getName()+")", e);
             throw new SkillzException("Unable to evaluate method : " + method, e);
         }
     }
@@ -160,7 +173,7 @@ public class DynamicSpeechlet implements Speechlet {
         try {
             Object result = registry.getInvoker().invoke(implementation, method.getName(), values);
             if (result != Void.class) {
-                LOGGER.info("Non-void return from " + method.getName() + " method : " + method);
+                LOGGER.warning("Non-void return from " + method.getName() + " method : " + method);
             }
         } catch (InvokerException e) {
             throw new SkillzException("Unable to evaluate method : " + method, e);

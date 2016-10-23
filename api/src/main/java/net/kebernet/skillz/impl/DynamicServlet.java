@@ -23,6 +23,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A subclass of Speechlet Servlet that delegates to the DynamicSpeechlet.
@@ -32,6 +34,16 @@ public class DynamicServlet extends SpeechletServlet {
     private static final String TEXT_PLAIN = "text/plain";
     private static final String UTF_8 = "utf-8";
     private static final String INTENTS = "intents";
+    private static final Logger LOGGER = Logger.getLogger(SpeechletServlet.class.getCanonicalName());
+
+    @Override
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        try {
+            super.service(req, resp);
+        } catch(Exception e){
+            LOGGER.log(Level.WARNING, "Unexpected exception in servlet", e);
+        }
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

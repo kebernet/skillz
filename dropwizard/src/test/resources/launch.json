@@ -1,0 +1,52 @@
+/**
+ *    Copyright (c) 2016 Robert Cooper
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+{
+  "version": "1.0",
+  "session": {
+    "new": true,
+    "sessionId": "amzn1.echo-api.session.846d3125-057a-465c-bc37-f8169d9bd086",
+    "application": {
+      "applicationId": "amzn1.ask.skill.9b6e14e9-d303-4b15-9630-a9e24d9d3bb7"
+    },
+    "user": {
+      "userId": "amzn1.ask.account.AFA47JVP37WSAN7WBMFBMSWCBYXXKC5N5QACCK55OJTWWTYFTECM6W3EBO3KGH72WDHJPYQHYZ4MYBJZUTYC74FAS34HKPBFNSZDLCHN3XQ6XHHQUAUYINGHCELZBC3KPS6Y3S4CXFPJFHRKHHZGEK43Y3TYGNSHGR2SCV3X6AQ7CGYJRZDUGFLAQMEZOHHKZ3V3OUJN7G2QXUY"
+    }
+  },
+  "context": {
+    "AudioPlayer": {
+      "playerActivity": "STOPPED"
+    },
+    "System": {
+      "application": {
+        "applicationId": "amzn1.ask.skill.9b6e14e9-d303-4b15-9630-a9e24d9d3bb7"
+      },
+      "user": {
+        "userId": "amzn1.ask.account.AFA47JVP37WSAN7WBMFBMSWCBYXXKC5N5QACCK55OJTWWTYFTECM6W3EBO3KGH72WDHJPYQHYZ4MYBJZUTYC74FAS34HKPBFNSZDLCHN3XQ6XHHQUAUYINGHCELZBC3KPS6Y3S4CXFPJFHRKHHZGEK43Y3TYGNSHGR2SCV3X6AQ7CGYJRZDUGFLAQMEZOHHKZ3V3OUJN7G2QXUY"
+      },
+      "device": {
+        "supportedInterfaces": {
+          "AudioPlayer": {}
+        }
+      }
+    }
+  },
+  "request": {
+    "type": "LaunchRequest",
+    "requestId": "amzn1.echo-api.request.bfcc104f-17a2-4e6c-8f15-2e927b24f3a3",
+    "timestamp": "2016-10-23T07:16:30Z",
+    "locale": "en-US"
+  }
+}

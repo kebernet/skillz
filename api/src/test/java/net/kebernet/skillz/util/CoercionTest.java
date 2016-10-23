@@ -20,7 +20,8 @@ import org.junit.Test;
 import java.util.Calendar;
 import java.util.Date;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class CoercionTest {
 
@@ -56,9 +57,6 @@ public class CoercionTest {
         //Identity for passthrough conversions
         Object four = Integer.valueOf(4);
         assertTrue(coercion.coerce(four, Integer.class) == four);
-
-        //Except empty Strings become null.
-        assertEquals(null, coercion.coerce("", String.class));
 
         assertEquals(TestEnum.FIRST, coercion.coerce("first", TestEnum.class));
         assertEquals(TestEnum.SECOND, coercion.coerce(1, TestEnum.class));
