@@ -55,11 +55,11 @@ public class MustacheBundleTest {
 
     @Test
     public void testLanguageSwitch(){
-        MustacheBundle bundle = new MustacheBundle("/langSwitch", "en");
+        MustacheBundle bundle = new MustacheBundle("/langswitch", "en");
         OutputSpeech speech = bundle.createOutputSpeech("Robert", mock(IntentRequest.class), SESSION);
         assertTrue(speech instanceof PlainTextOutputSpeech);
         assertEquals("Hello Robert", ((PlainTextOutputSpeech) speech).getText().trim());
-        bundle = new MustacheBundle("/langSwitch", "es");
+        bundle = new MustacheBundle("/langswitch", "es");
         speech = bundle.createOutputSpeech("Roberto", mock(IntentRequest.class), SESSION);
         assertTrue(speech instanceof PlainTextOutputSpeech);
         assertEquals("Hola Roberto", ((PlainTextOutputSpeech) speech).getText().trim());
