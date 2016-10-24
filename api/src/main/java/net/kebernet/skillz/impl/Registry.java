@@ -16,13 +16,12 @@
 package net.kebernet.skillz.impl;
 
 import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
-import io.github.lukehutch.fastclasspathscanner.matchprocessor.ClassAnnotationMatchProcessor;
 import net.kebernet.invoker.runtime.Invoker;
 import net.kebernet.invoker.runtime.impl.IntrospectionData;
 import net.kebernet.skillz.SkillzException;
+import net.kebernet.skillz.annotation.ExpressionValue;
 import net.kebernet.skillz.annotation.Intent;
 import net.kebernet.skillz.annotation.Launched;
-import net.kebernet.skillz.annotation.ExpressionValue;
 import net.kebernet.skillz.annotation.SessionEnded;
 import net.kebernet.skillz.annotation.SessionStarted;
 import net.kebernet.skillz.annotation.Skill;
@@ -112,11 +111,14 @@ public class Registry {
                 .collect(Collectors.toSet());
     }
 
+    @SuppressWarnings("WeakerAccess")
     public Invoker getInvoker(){
         return this.invoker;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static String createParameterName(Parameter p){
+        //noinspection unchecked
         if(!checkMaxOneOf(p, Slot.class, ExpressionValue.class)){
             throw new SkillzException(p.getType()+" "+p.getName()+" has more than a single value annotation on it.");
         }
@@ -132,7 +134,9 @@ public class Registry {
         return null;
     }
 
+    @SuppressWarnings("WeakerAccess")
     static String createMethodName(Method m){
+        //noinspection unchecked
         if(!checkMaxOneOf(m, Intent.class, SessionEnded.class, SessionStarted.class, Launched.class)){
             throw new SkillzException(m.getDeclaringClass().getCanonicalName()+"."+m.getName()+
                     " has more than a single operational annotation on it.");
@@ -160,9 +164,11 @@ public class Registry {
         return null;
     }
 
+    @SuppressWarnings("WeakerAccess")
+    @SafeVarargs
     static boolean checkMaxOneOf(AnnotatedElement target, Class<? extends Annotation>... annotations){
         int count = 0;
-        for(Class<? extends Annotation> type : annotations){
+        for(@SuppressWarnings("unchecked") Class<? extends Annotation> type : annotations == null ? new Class[0] : annotations){
             count += target.getAnnotation(type) != null ? 1 : 0;
             if(count > 1){
                 return false;

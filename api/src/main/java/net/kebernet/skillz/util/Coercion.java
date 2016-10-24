@@ -280,7 +280,9 @@ public class Coercion {
             if(String.class.equals(destination) && convert == null){
                 return (D) source.toString();
             }
-            if(sourceClass.isAssignableFrom(destination))
+            if(sourceClass.isAssignableFrom(destination)){
+                return (D) source;
+            }
             checkNotNull(convert, "Could not find a converter to go from "+sourceClass+" to "+destination);
             return convert.convert(source);
         }

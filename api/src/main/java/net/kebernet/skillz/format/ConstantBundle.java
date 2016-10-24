@@ -31,7 +31,22 @@ import java.util.logging.Logger;
 
 /**
  * This is a Bundle that just reads from files and doesn't transform them in any way.
+ * 
+ * <p>
+ * You can create a <code>ConstantBundle</code> to return simple constant responses from your Skill. This is
+ * useful for help text and the like.
+ * The bundle will look for <code>[resourcePath].[languageCode].[format]</code> on the classpath
+ * (<code>resourcePath</code> should likely start with a "/" since it will be loaded relative to the
+ * <code>MustacheBundle</code> classpath).
+ * </p>
+ * <p>
+ * If the given language code doesn't exist, it will look for a template without a language. Format can
+ * be <code>ssml</code>, <code>txt</code>, or <code>card</code>. Card will always be used to format your card content. If
+ * <code>ssml</code> is present, it will be used to format an <code>SsmlSpeechOutput</code>. If that is not present,
+ * the <code>txt</code> template will be used to create a <code>PlainTextSpeechOutput</code> response.
+ * </p>
  */
+@SuppressWarnings("unused")
 public class ConstantBundle implements Bundle {
     private static final Logger LOGGER = Logger.getLogger(ResourceBundle.class.getCanonicalName());
     private final String bundleName;
@@ -39,6 +54,12 @@ public class ConstantBundle implements Bundle {
     private String txt;
     private String card;
 
+    /**
+     * Creates a new bundle based on the classpath resource "bundleName" and the given language code.
+     * @param bundleName A classpath prefix, starting with "/" to your template fiels
+     * @param languageCode The language code to check for.
+     */
+    @SuppressWarnings("WeakerAccess")
     public ConstantBundle(String bundleName, String languageCode) {
         this.bundleName = bundleName;
         this.ssml = readFromResource(bundleName, languageCode, "ssml");
@@ -50,7 +71,7 @@ public class ConstantBundle implements Bundle {
         URL url = null;
         try {
             url = ConstantBundle.class.getResource(resourceBaseName+"."+languageCode+"."+fileType);
-            url = url == null ? MustacheBundle.class.getResource(resourceBaseName+"."+fileType) : url;
+            url = url == null ? ConstantBundle.class.getResource(resourceBaseName+"."+fileType) : url;
             if(url != null) {
                 return CharStreams.toString(new InputStreamReader(url.openStream(), "utf-8"));
             }

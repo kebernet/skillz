@@ -22,6 +22,7 @@ import com.amazon.speech.ui.Card;
 import com.amazon.speech.ui.OutputSpeech;
 import com.amazon.speech.ui.Reprompt;
 import net.kebernet.skillz.Formatter;
+import net.kebernet.skillz.SkillzException;
 import net.kebernet.skillz.builder.RepromptBuilder;
 import net.kebernet.skillz.builder.SimpleCardBuilder;
 import net.kebernet.skillz.builder.StandardCardBuilder;
@@ -32,6 +33,7 @@ import javax.annotation.Nullable;
 /**
  * An abstract Formatter implementation for creating a formatter from Bundles.
  */
+@SuppressWarnings("unused")
 public abstract class AbstractBundleFormatter<T> implements Formatter<T> {
 
     private final Bundle bundle;
@@ -51,12 +53,6 @@ public abstract class AbstractBundleFormatter<T> implements Formatter<T> {
     @Override
     public SpeechletResponse apply(T t, SpeechletRequest request, Session session) {
         OutputSpeech speech = bundle.createOutputSpeech(t, request, session);
-        Reprompt reprompt = null;
-        if(repromptBundle != null){
-            reprompt = RepromptBuilder.withOutputSpeech(
-                    repromptBundle.createOutputSpeech(t, request, session)
-            );
-        }
         String cardContent = bundle.createCardContent(t, request, session);
         String cardLargeImage = getCardLargeImage(t,request, session);
         Card card = null;
@@ -71,6 +67,15 @@ public abstract class AbstractBundleFormatter<T> implements Formatter<T> {
                     .build();
         }
         if(isAskResponse(t, request, session)){
+            Reprompt reprompt = null;
+            if(repromptBundle != null){
+                reprompt = RepromptBuilder.withOutputSpeech(
+                        repromptBundle.createOutputSpeech(t, request, session)
+                );
+            }
+            if(reprompt == null){
+                throw new SkillzException("As response with no reprompt: "+t+" "+request);
+            }
             SpeechletResponse response = SpeechletResponse.newAskResponse(speech, reprompt);
             response.setCard(card);
             return response;
@@ -117,5 +122,6 @@ public abstract class AbstractBundleFormatter<T> implements Formatter<T> {
      * @param session The session
      * @return URL for the image
      */
+    @SuppressWarnings("WeakerAccess")
     public abstract String getCardSmallImage(T t, SpeechletRequest request, Session session);
 }

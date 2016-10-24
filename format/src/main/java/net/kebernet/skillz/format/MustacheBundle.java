@@ -41,16 +41,24 @@ import static com.google.common.base.Preconditions.checkState;
 
 /**
  * A Bundle implementation that used Mustache.java to format responses.
+ *
+ * <p>This class will allow you to format </p>
  */
+@SuppressWarnings("WeakerAccess")
 public class MustacheBundle implements Bundle {
     private static final Logger LOGGER = Logger.getLogger(ResourceBundle.class.getCanonicalName());
-    private final MustacheFactory mf = new DefaultMustacheFactory();;
+    private final MustacheFactory mf = new DefaultMustacheFactory();
     private final String bundleName;
     private final String languageCode;
     private Mustache ssmlTemplate;
     private Mustache txtTemplate;
     private Mustache cardTemplate;
 
+    /**
+     * Creates a new bundle form a classpath resource
+     * @param bundleName The resource path. Should start with "/"
+     * @param languageCode The language code, if needed.
+     */
     public MustacheBundle(String bundleName, String languageCode) {
         this.bundleName = bundleName;
         this.languageCode = languageCode;
@@ -101,8 +109,7 @@ public class MustacheBundle implements Bundle {
         try (OutputStreamWriter writer = new OutputStreamWriter(baos, "utf-8")) {
             template.execute(writer, ctx);
             writer.flush();
-            String formatted = new String(baos.toByteArray(), "utf-8");
-            return formatted;
+            return new String(baos.toByteArray(), "utf-8");
         } catch (UnsupportedEncodingException e) {
             throw new SkillzException("Failed to encode formatted response", e);
         } catch (IOException e) {

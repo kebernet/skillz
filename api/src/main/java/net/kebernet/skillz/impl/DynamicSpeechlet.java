@@ -24,6 +24,8 @@ import com.amazon.speech.speechlet.Speechlet;
 import com.amazon.speech.speechlet.SpeechletException;
 import com.amazon.speech.speechlet.SpeechletRequest;
 import com.amazon.speech.speechlet.SpeechletResponse;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ArrayListMultimap;
 import net.kebernet.invoker.runtime.InvokerException;
 import net.kebernet.invoker.runtime.ParameterValue;
@@ -50,6 +52,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -60,11 +63,35 @@ import java.util.stream.Stream;
 public class DynamicSpeechlet implements Speechlet {
     private static final Logger LOGGER = Logger.getLogger(DynamicSpeechlet.class.getCanonicalName());
     private static final Coercion COERCION = new Coercion();
+    /**
+     * A cache for pre-compiled OGNL expressions
+     */
+    private static final Cache<String, Object> OGNL_EXPRESSIONS = CacheBuilder.newBuilder()
+            .maximumSize(100)
+            .build();
+    /**
+     * All the invokable methods for this instance grouped by invocation/intent name
+     */
     private final ArrayListMultimap<String, InvokableMethod> methods;
+    /**
+     * The introspected data for the wrapped type
+     */
     private final IntrospectionData data;
+    /**
+     * The Registry from the runtime.
+     */
     private final Registry registry;
+    /**
+     * The target implementation object.
+     */
     private final Object implementation;
+    /**
+     * Formatter mappings to possibly encode the response with.
+     */
     private final FormatterMappings responseMapper;
+    /**
+     * The TypeFactory for creating object instances.
+     */
     private final TypeFactory typeFactory;
 
     public DynamicSpeechlet(ArrayListMultimap<String, InvokableMethod> methods, IntrospectionData data, FormatterMappings responseMapper, Registry registry, Object implementation, TypeFactory typeFactory) {
@@ -76,6 +103,10 @@ public class DynamicSpeechlet implements Speechlet {
         this.typeFactory = typeFactory;
     }
 
+    /**
+     * The introspected data for the wrapped type
+     * @return IntrospectionData for thi instance.
+     */
     @SuppressWarnings("WeakerAccess")
     public IntrospectionData getData() {
         return data;
@@ -102,6 +133,16 @@ public class DynamicSpeechlet implements Speechlet {
         handleVoidEvent(SessionEnded.class, request, session);
     }
 
+    /**
+     * Handle an event that requires an response to the user.
+     *
+     * @param name Name of the event.
+     * @param request The request.
+     * @param session The session.
+     * @param <T> The request type
+     * @return A SpeechletResponse to return
+     * @throws SpeechletException Thrown when stuff goes bad. Real bad.
+     */
     private <T extends SpeechletRequest> SpeechletResponse handleResponseEvent(String name, T request, Session session) throws SpeechletException {
         try {
             LOGGER.fine("Doing response event " + name);
@@ -154,10 +195,18 @@ public class DynamicSpeechlet implements Speechlet {
     }
 
 
+    /**
+     * Handle an event that doesn't require a response to the user.
+     *
+     * @param annotation The annotation that is triggering this event.
+     * @param request The request
+     * @param session The session
+     * @param <T> The type of request
+     */
     private <T extends SpeechletRequest> void handleVoidEvent(Class<? extends Annotation> annotation, T request, Session session) {
         List<InvokableMethod> handlers = methods.get(annotation.getSimpleName());
         if (handlers == null || handlers.isEmpty()) {
-            return;
+            return; // This is a void event and we have nothing to do here.
         }
         if (handlers.size() == 1) {
             InvokableMethod method = handlers.iterator().next();
@@ -169,6 +218,12 @@ public class DynamicSpeechlet implements Speechlet {
         }
     }
 
+    /** Invoke the method where we don't care about the response. Will double check that the
+     * Invoker instance returns Void.class
+     *
+     * @param method The method to invoke
+     * @param values The parameters to pass.
+     */
     private void invokeVoidEvent(InvokableMethod method, List<ParameterValue> values) {
         try {
             Object result = registry.getInvoker().invoke(implementation, method.getName(), values);
@@ -186,12 +241,11 @@ public class DynamicSpeechlet implements Speechlet {
                     List<ParameterValue> possibleArguments = synthesizeValues(data, m, request, session);
                     int score = m.matchValue(m.getName(), possibleArguments);
                     return new MethodEvaluation(m, possibleArguments, score);
-                })
-                .filter(m->
-                        m.score >= 0)
-                .sorted()
-                .findFirst()
-                .orElseThrow(() -> new SkillzException("Unable to deal with methods: " + methods));
+                }) // create a set of MethodEvaluations that could match the intent/op name
+                .filter(m-> m.score >= 0) // filter out the candidates that don't match
+                .sorted() // Sort them based on match quality
+                .findFirst() // Take the best match
+                .orElseThrow(() -> new SkillzException("Unable to find a match from methods: " + methods));
     }
 
     /**
@@ -241,8 +295,8 @@ public class DynamicSpeechlet implements Speechlet {
     private static Object evaluate(Map<String, Object> context, String expression) {
         Object expr;
         try {
-            expr = Ognl.parseExpression(expression);
-        } catch (OgnlException e) {
+            expr = OGNL_EXPRESSIONS.get(expression, ()-> Ognl.parseExpression(expression) );
+        }  catch (ExecutionException e) {
             throw new SkillzException("Failed to parse '" + expression + "'", e);
         }
         Object value;
@@ -255,11 +309,21 @@ public class DynamicSpeechlet implements Speechlet {
         return value;
     }
 
+    /**
+     * This is an internal class used to rank possible InvokableMethods to determine which one we
+     * should use to handle a particular response given a list of ParameterValues.
+     */
     private static class MethodEvaluation implements Comparable {
         final InvokableMethod method;
         final List<ParameterValue> values;
         final int score;
 
+        /**
+         * Constructor.
+         * @param method
+         * @param values
+         * @param score
+         */
         private MethodEvaluation(InvokableMethod method, List<ParameterValue> values, int score) {
             this.method = method;
             this.values = values;
@@ -271,13 +335,16 @@ public class DynamicSpeechlet implements Speechlet {
                 return -1;
             }
             MethodEvaluation that = (MethodEvaluation) o;
+            // If both methods have the same candidate score...
             if (this.score == 0 && that.score == 0) {
                 int values = Integer.compare(that.values.size(), this.values.size());
                 if(values == 0){
+                    // If the values match, compare the difference between parameters and values.
                     int delta =  Integer.compare(
                             Math.abs(this.method.getParameters().size() - this.values.size()),
                             Math.abs(that.method.getParameters().size() - that.values.size()));
                     if(delta == 0) {
+                        // If they match, go for the closes set of parameters
                         return Integer.compare(this.method.getParameters().size(), that.method.getParameters().size());
                     } else {
                         return delta;
@@ -286,6 +353,7 @@ public class DynamicSpeechlet implements Speechlet {
                     return values;
                 }
             } else {
+                // Compare the candidate score for the methods.
                 return Integer.compare(that.score, this.score);
             }
         }

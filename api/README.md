@@ -241,3 +241,80 @@ will give you the "selectedItemId" key from the map.
 ```@ExpressionValue("session.user.userId")``` returns the unique user id.
 
 See also [https://en.wikipedia.org/wiki/OGNL](https://en.wikipedia.org/wiki/OGNL)
+
+Formatting Output
+-----------------
+
+You have already seen that ```Formatter```s are the class for turning your response objects into
+```SpeechletResponse``` types. But there are a lot of typical cases where you might want to make
+some important decisions in your "view" layer. To facilitate this, there is the ```AbstractBundleFormatter```
+class.
+
+This is a class you can subclass to build some smarter ```Formatter``` types. There is also the 
+"format" subproject, that includes a ```MustacheBundle``` you can use to template out your responses.
+ 
+ Let's go back to our simple example and create the ```SearchFormatter```.
+ 
+ ```java
+ 
+    public class SearchFormatter extends AbstractBundleFormatter<List<String>> {
+    
+        public SearchFormatter(){
+            // Create the formatter with our bundles
+            super(new MustacheBundle("/search_results", "en"), new ConstantBundle("/reprompt", "en"));
+        }
+        public boolean isAskResponse(List<String> response, SpeechletRequest request, Session session){
+            return response == null || response.isEmpty(); // <-- if the response was empty, we will
+                                                           // ask the user for a new query.
+        }
+    
+        public String getCardTitle(List<String> response , SpeechletRequest request, Session session){
+            return response == null || response.isEmpty() ? null : // <-- If we don't find anything we
+                "My Thing's Search Results";                       // don't need to put anything in the
+                                                                   // user's timeline.
+        }
+        // The Card icons to use if we return a card.
+        public String getCardLargeImage(List<String> response, SpeechletRequest request, Session session){
+            return response == null || response.isEmpty() ? null : Constants.MY_LARGE_IMAGE_URL;
+        }
+        public String getCardSmallImage(List<String> response, SpeechletRequest request, Session session){
+            return response == null || response.isEmpty() ? null : Constants.MY_SMALL_IMAGE_URL;
+        }
+        
+    }
+ 
+ ```
+ 
+ Now we need some content. Since we are using the ```MustacheBundle```, we can create a file called 
+ ```search_results.txt.mustache``` in our resources. This will be the file we format the results 
+ list with:
+ 
+ ```mustache
+    {{#response.isEmpty}}
+        I'm sorry. I couldn't find anything for that. Please try again.
+    {{/response}}
+    {{^response.isEmpty}}
+        I found {{response.size}} things! They are:
+        {{#response}}
+            {{.}}
+        {{/response}}
+    {{/response}}
+ ```
+ 
+ Next, a template for our timeline card in ```search_resutls.card.mustache```
+ 
+ ```mustache
+    You found these things using My Search Thing:
+    {{#response}}
+        {{.}}
+    {{/response}}
+ 
+ ```
+ 
+ And finally, ```reprompt.txt```. This is the ```ConstantBundle``` text file we will use to as
+ a reprompt if we didn't find anything for the user.
+ ```
+    I'm sorry. I didn't catch that. Please try a new search now.
+ ```
+ 
+ 

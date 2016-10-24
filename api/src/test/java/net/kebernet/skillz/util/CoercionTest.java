@@ -19,6 +19,8 @@ import org.junit.Test;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -28,7 +30,9 @@ public class CoercionTest {
     private Coercion coercion = new Coercion();
 
     @Test
-    public void testCoersions() {
+    public void testCoercions() {
+        HashMap foo = new HashMap<>();
+        assertTrue( foo == coercion.coerce(HashMap.class, foo, Map.class));
         assertEquals(Integer.valueOf(3), coercion.coerce("3", Integer.class));
         assertEquals(Integer.valueOf(3), coercion.coerce("03", Integer.class));
         assertEquals(Integer.valueOf(3), coercion.coerce("3", int.class));

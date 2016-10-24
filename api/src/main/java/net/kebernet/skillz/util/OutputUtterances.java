@@ -79,6 +79,7 @@ public class OutputUtterances {
      * Writes the utterances to an output stream
      * @param stream The stream to write to.
      */
+    @SuppressWarnings("WeakerAccess")
     public void writeTo(OutputStream stream){
         writeTo(new PrintWriter(new OutputStreamWriter(stream, Charset.forName("UTF-8"))));
     }

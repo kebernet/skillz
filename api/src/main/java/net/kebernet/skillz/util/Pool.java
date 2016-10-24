@@ -39,6 +39,7 @@ public class Pool<T> {
      * @param waitTimeout time to wait during checkout
      * @param waitTimeoutUnit time unit to wait during checkout
      */
+    @SuppressWarnings("WeakerAccess")
     public Pool(TypeFactory factory, Class<T> type, int count, long waitTimeout, TimeUnit waitTimeoutUnit){
         queue = new LinkedBlockingQueue<>(count);
         for(int i=0; i < count; i++){
@@ -68,7 +69,7 @@ public class Pool<T> {
      * @return Object from the pool.
      */
     public T checkout(){
-        T value = null;
+        T value;
         try {
             value = queue.poll(waitTimeout, waitTimeoutUnit);
         } catch (InterruptedException e) {

@@ -23,6 +23,7 @@ public class SkillzException extends RuntimeException {
     /**
      * Default constructor
      */
+    @SuppressWarnings("unused")
     public SkillzException() {
         super();
     }
