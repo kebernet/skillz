@@ -18,8 +18,6 @@ package net.kebernet.skillz.format;
 import com.amazon.speech.speechlet.Session;
 import com.amazon.speech.speechlet.SpeechletRequest;
 import com.amazon.speech.ui.OutputSpeech;
-import com.github.mustachejava.Mustache;
-import com.github.mustachejava.MustacheFactory;
 import com.google.common.io.CharStreams;
 import net.kebernet.skillz.builder.PlainTextOutputBuilder;
 import net.kebernet.skillz.builder.SsmlOutputBuilder;
@@ -30,7 +28,6 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.StreamSupport;
 
 /**
  * This is a Bundle that just reads from files and doesn't transform them in any way.

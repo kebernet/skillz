@@ -25,6 +25,7 @@ import io.dropwizard.Application;
 import io.dropwizard.Configuration;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import net.kebernet.skillz.util.ConfigureSystemProperties;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.GET;
@@ -46,6 +47,7 @@ public class TestApplication extends Application<Configuration> {
     @Override
     public void initialize(Bootstrap<Configuration> bootstrap) {
         super.initialize(bootstrap);
+        ConfigureSystemProperties.setForTesting();
         SkillzBundle bundle = new SkillzBundle("/skills/*");
         bootstrap.addBundle(bundle);
     }

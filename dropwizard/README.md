@@ -27,4 +27,11 @@ Getting Started
  or change the base bath of the skills you deploy. But if you just want to get started 
  quickly, this is all you need.
  
+ Pro Tip
+ -------
+ 
+ If you are starting a new project, the SkillzBundle is OK. If you are already using a DI framework
+ with your project (say, Guice/Dagger...) it is recommended you skip the Bundle and just wire Skillz
+ up through that.
+ 
  
