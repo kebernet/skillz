@@ -24,7 +24,7 @@ allprojects {
     }
 
     group 'net.kebernet.skillz'
-    version '0.0.13'
+    version '0.1.0'
 }
 
 subprojects {
