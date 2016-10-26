@@ -17,6 +17,7 @@ package net.kebernet.skillz.impl;
 
 import com.amazon.speech.speechlet.servlet.SpeechletServlet;
 import com.google.common.base.Strings;
+import net.kebernet.skillz.util.OutputIntents;
 import net.kebernet.skillz.util.OutputUtterances;
 
 import javax.servlet.ServletException;
@@ -32,6 +33,7 @@ import java.util.logging.Logger;
 public class DynamicServlet extends SpeechletServlet {
     private static final String UTTERANCES = "utterances";
     private static final String TEXT_PLAIN = "text/plain";
+    private static final String APPLICATION_JSON = "application/json";
     private static final String UTF_8 = "utf-8";
     private static final String INTENTS = "intents";
     private static final Logger LOGGER = Logger.getLogger(SpeechletServlet.class.getCanonicalName());
@@ -63,6 +65,12 @@ public class DynamicServlet extends SpeechletServlet {
                 break;
             }
             case INTENTS: {
+                DynamicSpeechlet speechlet = (DynamicSpeechlet) getSpeechlet();
+                OutputIntents output = new OutputIntents(speechlet.getData());
+                resp.setContentType(APPLICATION_JSON);
+                resp.setCharacterEncoding(UTF_8);
+                output.writeTo(resp.getWriter());
+                resp.flushBuffer();
                 break;
             }
             default:
