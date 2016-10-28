@@ -16,18 +16,23 @@
 package net.kebernet.skillz.util;
 
 import com.google.common.base.Joiner;
+import com.google.common.io.CharStreams;
 import net.kebernet.invoker.runtime.impl.IntrospectionData;
 import net.kebernet.invoker.runtime.impl.InvokableMethod;
 import net.kebernet.skillz.annotation.Intent;
 import net.kebernet.skillz.annotation.Utterances;
 
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -36,6 +41,9 @@ import java.util.stream.Stream;
  * the utterances text for the Amazon system.
  */
 public class OutputUtterances {
+    private static final Logger LOGGER = Logger.getLogger(OutputUtterances.class.getCanonicalName());
+    private static final String INCLUDE_URL = "include-url:";
+    private static final String INCLUDE_RESOURCE = "include-resource:";
 
     private final IntrospectionData data;
 
@@ -88,6 +96,23 @@ public class OutputUtterances {
         return Optional.ofNullable(invokableMethod.getNativeMethod().getAnnotation(Utterances.class))
                 .map(utterances ->
                         Arrays.stream(utterances.value())
+                        .flatMap(s ->{
+                            if(!s.startsWith(INCLUDE_URL)){
+                                return Stream.of(s);
+                            } else {
+                                try {
+                                    URL url = new URL(s.substring(INCLUDE_URL.length()));
+                                    return CharStreams
+                                            .readLines(new InputStreamReader(url.openStream()))
+                                            .stream()
+                                            .map(String::trim)
+                                            .filter(l->!l.isEmpty());
+                                } catch (java.io.IOException e) {
+                                    LOGGER.log(Level.WARNING, "Failed to fetch included url "+s.substring(INCLUDE_URL.length()+1));
+                                    return Stream.empty();
+                                }
+                            }
+                        })
                         .map(s->
                                 new StringBuilder(invokableMethod.getName())
                                         .append(" ")

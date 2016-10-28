@@ -26,6 +26,7 @@ public abstract class AmazonSlotTypes {
     public static final String TIME = "AMAZON.TIME";
     public static final String DURATION = "AMAZON.DURATION";
     public static final String FOUR_DIGIT_NUMBER = "AMAZON.FOUR_DIGIT_NUMBER";
+    @Deprecated
     public static final String LITERAL = "AMAZON.LITERAL";
 
 

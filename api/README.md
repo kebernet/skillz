@@ -151,14 +151,23 @@ Let's take a look at a simple class:
      ```java
          @Intent("Search")
          @Utterances({
-            "search for {query|aurora coffee}",
-            "find {query|aurora coffee}",
-            "give me {query|aurora coffee}"
+            "search for {aurora coffee|query}",
+            "find {aurora coffee|query}",
+            "give me {aurora coffee|query}"
          })
          public List<String> search(@Slot(name="query", type=AmazonSlotTypes.LITERAL) String query)
       ```
       
       These are the lines you will use to populate the Amazon web site later.
+      
+      Sometimes you might want to include a some generated utterances. If you want to do this, you can
+      have an utterance that looks like:
+      ```java
+         @Utterances("include-url:http://my.host/myUtteranceGenerator")
+      ```
+      
+      This should return a line-by line list of utterances that will be included in the generation with
+      the intent.
       
  5.   Almost there... Now we have a ```List<String>``` containing our search results,
       but we need to turn that into a SpeechletResponse. The first step is to put
@@ -167,9 +176,9 @@ Let's take a look at a simple class:
       ```java
          @Intent("Search")
          @Utterances({
-            "search for {query|aurora coffee}",
-            "find {query|aurora coffee}",
-            "give me {query|aurora coffee}"
+            "search for {aurora coffee|query}",
+            "find {aurora coffee|query}",
+            "give me {aurora coffee|query}"
          })
          @ResponseFormatter(SearchFormatter.class)
          public List<String> search(@Slot(name="query", type=AmazonSlotTypes.LITERAL) String query)
