@@ -129,9 +129,9 @@
 public class SearchForThings {
     @Intent("Search")
     @Utterances({
-        "search for {query|aurora coffee}",
-        "find {query|aurora coffee}",
-        "give me {query|aurora coffee}"
+        "search for {aurora coffee|query}",
+        "find {aurora coffee|query}",
+        "give me {aurora coffee|query}"
     })
     @ResponseFormatter(SearchFormatter.class)
     public List&lt;String&gt; search(
