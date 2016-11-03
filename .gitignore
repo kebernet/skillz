@@ -28,4 +28,5 @@ gen
 /*.eml
 /*.ipr
 /*.iws
+._.DS_Store
 

@@ -15,7 +15,7 @@ apply plugin: 'nebula.maven-publish'
 
 allprojects {
     repositories {
-        mavenCentral()
+        mavenCentral()cd
         jcenter()
         //mavenLocal()
         maven {
@@ -24,7 +24,7 @@ allprojects {
     }
 
     group 'net.kebernet.skillz'
-    version '0.1.4'
+    version '0.1.5'
 }
 
 subprojects {

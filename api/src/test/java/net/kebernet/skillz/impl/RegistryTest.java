@@ -26,7 +26,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class RegistryTest {
-    Registry registry = new Registry();
+    private Registry registry = new Registry();
 
     @Test
     public void simpleDiscoveryTest() throws Exception {

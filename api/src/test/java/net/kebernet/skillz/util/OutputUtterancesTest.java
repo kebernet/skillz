@@ -26,9 +26,7 @@ import java.util.HashSet;
 
 import static org.junit.Assert.*;
 
-/**
- * Created by rcooper on 10/19/16.
- */
+
 public class OutputUtterancesTest {
 
 

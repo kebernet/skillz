@@ -21,6 +21,7 @@ import com.amazon.speech.speechlet.SpeechletResponse;
 import com.amazon.speech.ui.Card;
 import com.amazon.speech.ui.OutputSpeech;
 import com.amazon.speech.ui.Reprompt;
+import com.google.common.base.Splitter;
 import net.kebernet.skillz.Formatter;
 import net.kebernet.skillz.SkillzException;
 import net.kebernet.skillz.builder.RepromptBuilder;
@@ -29,13 +30,14 @@ import net.kebernet.skillz.builder.StandardCardBuilder;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.logging.Logger;
 
 /**
  * An abstract Formatter implementation for creating a formatter from Bundles.
  */
 @SuppressWarnings("unused")
 public abstract class AbstractBundleFormatter<T> implements Formatter<T> {
-
+    private static final Logger LOGGER = Logger.getLogger(AbstractBundleFormatter.class.getCanonicalName());
     private final Bundle bundle;
     private final Bundle repromptBundle;
 
@@ -54,6 +56,7 @@ public abstract class AbstractBundleFormatter<T> implements Formatter<T> {
     public SpeechletResponse apply(T t, SpeechletRequest request, Session session) {
         OutputSpeech speech = bundle.createOutputSpeech(t, request, session);
         String cardContent = bundle.createCardContent(t, request, session);
+        cardContent = truncateCardContent(cardContent);
         String cardLargeImage = getCardLargeImage(t,request, session);
         Card card = null;
         if(cardLargeImage != null){
@@ -85,6 +88,31 @@ public abstract class AbstractBundleFormatter<T> implements Formatter<T> {
             return response;
         }
 
+    }
+
+    private String truncateCardContent(String cardContent) {
+        if(cardContent == null){
+            return cardContent;
+        }
+        if(cardContent.length() < 8000){
+            return cardContent;
+        }
+        StringBuilder sb = new StringBuilder();
+        int lineCount = 0;
+        for(String line : Splitter.on('\n')
+                .split(cardContent)){
+            if(sb.length() == 0 && line.length() >= 8000){
+                LOGGER.warning("Card content is over the limit and will be truncated.");
+                return line.substring(0, 7999);
+            }
+            if(sb.length() + line.length() >= 7999){
+                LOGGER.warning("Card content is too long and will be truncated to "+lineCount);
+                return sb.toString();
+            }
+            sb.append(line).append('\n');
+            lineCount++;
+        }
+        return sb.toString();
     }
 
     /**
