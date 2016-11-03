@@ -15,7 +15,7 @@ apply plugin: 'nebula.maven-publish'
 
 allprojects {
     repositories {
-        mavenCentral()cd
+        mavenCentral()
         jcenter()
         //mavenLocal()
         maven {
