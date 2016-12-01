@@ -82,7 +82,14 @@ public class MustacheBundle implements Bundle {
 
     @Override
     public String createCardContent(Object response, SpeechletRequest request, Session session){
-        return cardTemplate == null ? null : format(cardTemplate, response, request, session);
+        String cardContent = cardTemplate == null ? null : format(cardTemplate, response, request, session);
+        if(cardContent.lastIndexOf(" ") == -1){
+            return cardContent.substring(0, 7999);
+        }
+        while(cardContent.length() > 8000){
+            cardContent = cardContent.substring(0, cardContent.lastIndexOf(" ")) + "...";
+        }
+        return cardContent;
     }
 
     private static Mustache createMustacheFromResource(MustacheFactory mf, String resourceBaseName, String languageCode, String fileType){

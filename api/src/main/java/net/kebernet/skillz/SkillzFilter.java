@@ -15,6 +15,7 @@
  */
 package net.kebernet.skillz;
 
+import com.amazon.speech.speechlet.Speechlet;
 import com.google.common.base.Strings;
 import com.google.common.collect.ArrayListMultimap;
 import net.kebernet.invoker.runtime.impl.IntrospectionData;
@@ -146,7 +147,7 @@ public class SkillzFilter implements Filter {
             }
             servlet.setSpeechlet(speechlet);
             servlet.service(req, res);
-            servlet.setSpeechlet(null);
+            servlet.setSpeechlet((Speechlet) null);
             pool.checkin(servlet);
         }
     }
