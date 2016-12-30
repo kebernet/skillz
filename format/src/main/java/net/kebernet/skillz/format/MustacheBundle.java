@@ -21,6 +21,7 @@ import com.amazon.speech.ui.OutputSpeech;
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
+import com.google.common.base.Strings;
 import net.kebernet.skillz.SkillzException;
 import net.kebernet.skillz.builder.PlainTextOutputBuilder;
 import net.kebernet.skillz.builder.SsmlOutputBuilder;
@@ -82,14 +83,15 @@ public class MustacheBundle implements Bundle {
 
     @Override
     public String createCardContent(Object response, SpeechletRequest request, Session session){
-        String cardContent = cardTemplate == null ? null : format(cardTemplate, response, request, session);
+        String cardContent = cardTemplate == null ? "" : format(cardTemplate, response, request, session);
         if(cardContent.lastIndexOf(" ") == -1){
             return cardContent.substring(0, 7999);
         }
         while(cardContent.length() > 8000){
             cardContent = cardContent.substring(0, cardContent.lastIndexOf(" ")) + "...";
         }
-        return cardContent;
+
+        return Strings.isNullOrEmpty(cardContent) ? null : cardContent;
     }
 
     private static Mustache createMustacheFromResource(MustacheFactory mf, String resourceBaseName, String languageCode, String fileType){
