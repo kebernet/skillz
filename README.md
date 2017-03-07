@@ -5,7 +5,7 @@ _"You know, like nunchuck skills, bow hunting skills, computer hacking skills.
 Girls only like guys who have great skills."_
 
 [![Build Status](https://travis-ci.org/kebernet/skillz.svg?branch=master)](https://travis-ci.org/kebernet/skillz)
-
+[![Download](https://api.bintray.com/packages/kebernet/maven/skillz/images/download.svg) ](https://bintray.com/kebernet/maven/skillz/_latestVersion)
 
 NOTICE
 ------

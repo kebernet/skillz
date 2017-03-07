@@ -77,7 +77,7 @@ public class MustacheBundle implements Bundle {
     public OutputSpeech createOutputSpeech(Object response, SpeechletRequest request, Session session){
         boolean useSSML = ssmlTemplate != null;
         String formatted = format(useSSML ? ssmlTemplate : txtTemplate, response, request, session);
-        return useSSML ? SsmlOutputBuilder.withSsml(formatted).build() :
+        return useSSML ? SsmlOutputBuilder.withSsml(formatted.replaceAll("\n", "").replaceAll("  +", "")).build() :
                 PlainTextOutputBuilder.withText(formatted).build();
     }
 

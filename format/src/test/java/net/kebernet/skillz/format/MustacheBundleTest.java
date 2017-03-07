@@ -34,6 +34,7 @@ import static org.mockito.Mockito.mock;
 
 public class MustacheBundleTest {
     private static final HashMap<String, Object> ATTS = new HashMap<>();
+    @SuppressWarnings("deprecation")
     private static final Session SESSION = Session.builder()
             .withApplication(new Application("foo"))
             .withUser(new User("foo@foo.com"))
@@ -76,7 +77,7 @@ public class MustacheBundleTest {
         OutputSpeech speech = bundle.createOutputSpeech(response, mock(IntentRequest.class), SESSION);
         assertTrue(speech instanceof SsmlOutputSpeech);
         StringBuilder sb = new StringBuilder("<speak>");
-        response.forEach(s-> sb.append("    <s>").append(s).append("</s>\n"));
+        response.forEach(s-> sb.append("<s>").append(s).append("</s>"));
         sb.append("</speak>");
         assertEquals(sb.toString(), ((SsmlOutputSpeech) speech).getSsml().trim());
 

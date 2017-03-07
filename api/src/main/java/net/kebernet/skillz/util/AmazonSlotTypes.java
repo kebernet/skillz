@@ -31,7 +31,7 @@ public abstract class AmazonSlotTypes {
     /**
      * Names of actors and actresses.
      */
-    public static final String ACTOR= "AMAZON.Actor";
+    public static final String ACTOR = "AMAZON.Actor";
     /**
      * Geographical regions that are typically under the jurisdiction of a particular government
      */
